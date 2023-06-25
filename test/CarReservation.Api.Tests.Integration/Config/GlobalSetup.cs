@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
+using NUnit.Framework;
 
 namespace CarReservation.Api.Tests.Integration.Config
 {

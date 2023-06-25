@@ -17,14 +17,6 @@ namespace CarReservation.Api.Tests.Integration.Config
                 .WithWebHostBuilder(builder =>
                 {
                     builder.UseEnvironment("Testing");
-                    //builder.ConfigureAppConfiguration(config =>
-                    //{
-                    //    config.AddInMemoryCollection(new Dictionary<string, string?>
-                    //    {
-                    //        ["ConnectionStrings:MongoDb"] = _mongoDb.GetConnectionString(),
-                    //        ["ConnectionStrings:AzureStorage"] = _azurite.GetConnectionString(),
-                    //    });
-                    //});
                 });
 
             TestServer = factory.Server;

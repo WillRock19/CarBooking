@@ -46,7 +46,7 @@ namespace CarReservation.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
 
             var carId = carService.AddCar(carRequest);
-            return Accepted(new CarAddedResponse(carId));
+            return Accepted(new { carId });
         }
 
         [HttpPut]

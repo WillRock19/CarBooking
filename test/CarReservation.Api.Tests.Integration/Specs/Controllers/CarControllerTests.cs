@@ -25,7 +25,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             result.EnsureSuccessStatusCode();
 
             var carCreatedResponse = JsonDocument.Parse(await result.Content.ReadAsStringAsync());
-            var cardCreatedId = carCreatedResponse.RootElement.GetProperty("id").ToString();
+            var cardCreatedId = carCreatedResponse.RootElement.GetProperty("carId").ToString();
 
             // Act
             var carFromDatabase = await HttpClient.GetAsync($"{EndpointBaseRoute}/{cardCreatedId}");
@@ -48,11 +48,11 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
 
             var result1 = await HttpClient.PostAsync(EndpointBaseRoute, postContent1);
             var carCreatedResponse1 = JsonDocument.Parse(await result1.Content.ReadAsStringAsync());
-            var cardCreatedId1 = carCreatedResponse1.RootElement.GetProperty("id").ToString();
+            var cardCreatedId1 = carCreatedResponse1.RootElement.GetProperty("carId").ToString();
 
             var result2 = await HttpClient.PostAsync(EndpointBaseRoute, postContent2);
             var carCreatedResponse2 = JsonDocument.Parse(await result1.Content.ReadAsStringAsync());
-            var cardCreatedId2 = carCreatedResponse2.RootElement.GetProperty("id").ToString();
+            var cardCreatedId2 = carCreatedResponse2.RootElement.GetProperty("carId").ToString();
 
             // Act
             var carFromDatabase = await HttpClient.GetAsync(EndpointBaseRoute);
@@ -75,7 +75,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             result.EnsureSuccessStatusCode();
 
             var carAddedResponse = JsonDocument.Parse(await result.Content.ReadAsStringAsync());
-            var cardCreatedId = carAddedResponse.RootElement.GetProperty("id").ToString();
+            var cardCreatedId = carAddedResponse.RootElement.GetProperty("carId").ToString();
 
             var updatedCarRequest = new CarRequestBuilder().WithMake("Updating Second Make").WithModel("Updating Second Model").Build();
             var putContent = new StringContent(JsonConvert.SerializeObject(updatedCarRequest), Encoding.UTF8, AcceptedContentType);
@@ -103,7 +103,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             createResponse.EnsureSuccessStatusCode();
 
             var carCreatedResponse = JsonDocument.Parse(await createResponse.Content.ReadAsStringAsync());
-            var cardCreatedId = carCreatedResponse.RootElement.GetProperty("id").ToString();
+            var cardCreatedId = carCreatedResponse.RootElement.GetProperty("carId").ToString();
 
             // Act
             var deleteResponse = await HttpClient.DeleteAsync($"{EndpointBaseRoute}/{cardCreatedId}");

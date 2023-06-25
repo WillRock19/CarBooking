@@ -14,10 +14,18 @@ namespace CarReservation.Api.Repositories
             Database = new();
         }
 
-        public string AddCar(Car entity)
+        public IEnumerable<Car> GetAll() => Database.Values;
+
+        public Car? GetById(string carId)
+        {
+            Database.TryGetValue(carId, out var entity);
+            return entity;
+        }
+
+        public string Add(Car entity)
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            
+
             var updatedLatestRegisterCount = LatestRegisterCount + 1;
             var entityId = Car.CreateId(updatedLatestRegisterCount);
 
@@ -29,18 +37,10 @@ namespace CarReservation.Api.Repositories
 
         public void Delete(string carId)
         {
-            if(!Database.ContainsKey(carId))
+            if (!Database.ContainsKey(carId))
                 throw new KeyNotFoundException($"Operation cannot be completed. There's no card with id '{carId}'.");
 
             Database.Remove(carId);
-        }
-
-        public IEnumerable<Car> GetAll() => Database.Values;
-
-        public Car? GetById(string carId)
-        {
-            Database.TryGetValue(carId, out var entity);
-            return entity;
         }
     }
 }

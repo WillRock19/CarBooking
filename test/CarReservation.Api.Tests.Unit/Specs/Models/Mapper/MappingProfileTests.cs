@@ -33,7 +33,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
         [Test]
         public void Profile_WhenCarRequestPropertiesHaveValue_MapToCarCorrectly()
         {
-            var carRequest = new CarRequest() { Make = "Some make", Model = "Some model" };
+            var carRequest = new CarRequestBuilder().Build();
 
             var result = mapper.Map<Car>(carRequest);
 

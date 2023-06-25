@@ -7,6 +7,12 @@ namespace CarReservation.Api.Interfaces
     {
         IEnumerable<CarResponse> GetAllCars();
 
-        string InsertCar(CarRequest carRequest);
+        CarResponse GetCar(string carId);
+
+        string AddCar(CarRequest carRequest);
+
+        CarResponse UpdateCar(CarRequest carRequest);
+
+        void DeleteCar(string carId);
     }
 }

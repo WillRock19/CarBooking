@@ -4,7 +4,7 @@ namespace CarReservation.Api.Interfaces
 {
     public interface ICarRepository
     {
-        string AddCar(Car entity);
+        string Add(Car entity);
 
         Car? GetById(string carId);
 

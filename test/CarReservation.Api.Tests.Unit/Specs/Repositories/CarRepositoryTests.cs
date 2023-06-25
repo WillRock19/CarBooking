@@ -14,7 +14,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 var repository = new CarRepository();
                 
-                Func<string> action = () => repository.AddCar(null);
+                Func<string> action = () => repository.Add(null);
 
                 action.Should().Throw<ArgumentException>().WithParameterName("entity");
             }
@@ -25,7 +25,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
                 var repository = new CarRepository();
                 var originalCar = new CarBuilder().Build();
 
-                var carId = repository.AddCar(originalCar);
+                var carId = repository.Add(originalCar);
 
                 repository.GetById(carId).Should().BeEquivalentTo(originalCar with { Id = carId });
             }
@@ -38,8 +38,8 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
                 var car2 = new CarBuilder().WithMake("Some Maker Name 2").Build();
                 var expectedIds = new List<string>() { "C1", "C2" };
                 
-                repository.AddCar(car1);
-                repository.AddCar(car2);
+                repository.Add(car1);
+                repository.Add(car2);
 
                 repository.GetAll().All(x => expectedIds.Any(id => id == x.Id)).Should().BeTrue();
             }
@@ -52,9 +52,9 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 var repository = new CarRepository();
 
-                repository.AddCar(new CarBuilder().Build());
-                repository.AddCar(new CarBuilder().Build());
-                repository.AddCar(new CarBuilder().Build());
+                repository.Add(new CarBuilder().Build());
+                repository.Add(new CarBuilder().Build());
+                repository.Add(new CarBuilder().Build());
 
                 var allCars = repository.GetAll();
 
@@ -79,7 +79,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 var repository = new CarRepository();
                 var carToInsert = new CarBuilder().WithMake("Specific make").WithModel("Specific model").Build();
-                var carId = repository.AddCar(carToInsert);
+                var carId = repository.Add(carToInsert);
 
                 var carRetrieved = repository.GetById(carId);
 
@@ -90,7 +90,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             public void WhenRepositoryDoesNotHaveCarWithId_ReturnsNull()
             {
                 var repository = new CarRepository();
-                repository.AddCar(new CarBuilder().WithMake("Specific make").WithModel("Specific model").Build());
+                repository.Add(new CarBuilder().WithMake("Specific make").WithModel("Specific model").Build());
 
                 var carRetrieved = repository.GetById("SomeInexistentId");
                 carRetrieved.Should().BeNull();
@@ -104,7 +104,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 var repository = new CarRepository();
                 var carToInsert = new CarBuilder().WithMake("Specific make").WithModel("Specific model").Build();
-                var carId = repository.AddCar(carToInsert);
+                var carId = repository.Add(carToInsert);
 
                 repository.Delete(carId);
 

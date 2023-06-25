@@ -32,29 +32,43 @@ namespace CarReservation.Api.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddCar([FromBody] CarRequest carRequest)
+        public async Task<IActionResult> AddCar([FromBody] CarRequest carRequest)
         {
             if (carRequest == null)
-                return UnprocessableEntity("Body content cannot be null.");
+                return UnprocessableEntity("Request content cannot be null.");
 
-            var validationResult = validator.Validate(carRequest);
+            var validationResult = await validator.ValidateAsync(carRequest);
 
             if(!validationResult.IsValid)
-                return BadRequest(validationResult.Errors);
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
 
-            var carId = carService.InsertCar(carRequest);
+            var carId = carService.AddCar(carRequest);
             return Accepted(new { carId });
         }
 
         [HttpPut("{car_id}")]
-        public IActionResult UpdateCar([FromQuery] string car_id, [FromBody] CarRequest car)
+        public async Task<IActionResult> UpdateCar([FromQuery] string car_id, [FromBody] CarRequest carRequest)
         {
+            if (string.IsNullOrEmpty(car_id))
+                return BadRequest($"Query parameter {nameof(car_id)} cannot be null or empty.");
+
+            if (carRequest == null)
+                return UnprocessableEntity("Request content cannot be null.");
+
+            var validationResult = await validator.ValidateAsync(carRequest);
+
+            if (!validationResult.IsValid)
+                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+
             return Accepted();
         }
 
         [HttpDelete("{car_id}")]
-        public IActionResult RemoveCar([FromQuery] string car_id)
+        public IActionResult RemoveById([FromQuery] string car_id)
         {
+            if (string.IsNullOrEmpty(car_id))
+                return BadRequest($"Query parameter {nameof(car_id)} cannot be null or empty.");
+
             return NoContent();
         }
     }

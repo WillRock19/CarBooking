@@ -23,10 +23,25 @@ namespace CarReservation.Api.Services
             return mapper.Map<IEnumerable<CarResponse>>(carsFromDatabase);
         }
 
-        public string InsertCar(CarRequest carRequest)
+        public CarResponse GetCar(string carId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string AddCar(CarRequest carRequest)
         {
             var carEntity = mapper.Map<Car>(carRequest);
-            return carRepository.AddCar(carEntity);
+            return carRepository.Add(carEntity);
+        }
+
+        public CarResponse UpdateCar(CarRequest carRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteCar(string carId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

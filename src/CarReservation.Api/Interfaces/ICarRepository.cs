@@ -6,6 +6,8 @@ namespace CarReservation.Api.Interfaces
     {
         string Add(Car entity);
 
+        Car Update(Car entity);
+
         Car? GetById(string carId);
 
         IEnumerable<Car> GetAll();

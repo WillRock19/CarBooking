@@ -23,9 +23,13 @@ namespace CarReservation.Api.Services
             return mapper.Map<IEnumerable<CarResponse>>(carsFromDatabase);
         }
 
-        public CarResponse GetCar(string carId)
+        public CarResponse? GetCar(string carId)
         {
-            throw new NotImplementedException();
+            var car = carRepository.GetById(carId);
+
+            if (car == null) return null;
+
+            return mapper.Map<CarResponse>(car);
         }
 
         public string AddCar(CarRequest carRequest)
@@ -34,14 +38,17 @@ namespace CarReservation.Api.Services
             return carRepository.Add(carEntity);
         }
 
-        public CarResponse UpdateCar(CarRequest carRequest)
+        public CarResponse UpdateCar(string carId, CarRequest carRequest)
         {
-            throw new NotImplementedException();
+            var _ = carRepository.GetById(carId) ?? throw new KeyNotFoundException($"Operation cannot be completed. There's no car with {carId}");
+            var carUpdated = carRepository.Update(mapper.Map<Car>(carRequest) with 
+            { 
+                Id = carId 
+            });
+
+            return mapper.Map<CarResponse>(carUpdated);
         }
 
-        public void DeleteCar(string carId)
-        {
-            throw new NotImplementedException();
-        }
+        public void DeleteCar(string carId) => carRepository.Delete(carId);
     }
 }

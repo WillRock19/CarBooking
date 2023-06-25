@@ -35,12 +35,26 @@ namespace CarReservation.Api.Repositories
             return entityId;
         }
 
+        public Car Update(Car entity)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            CheckIfCarIdExistsAndMaybeThrow(entity.Id);
+
+            Database[entity.Id] = entity;
+            return entity;
+        }
+
         public void Delete(string carId)
+        {
+            CheckIfCarIdExistsAndMaybeThrow(carId);
+            Database.Remove(carId);
+        }
+
+        private void CheckIfCarIdExistsAndMaybeThrow(string carId) 
         {
             if (!Database.ContainsKey(carId))
                 throw new KeyNotFoundException($"Operation cannot be completed. There's no card with id '{carId}'.");
-
-            Database.Remove(carId);
         }
     }
 }

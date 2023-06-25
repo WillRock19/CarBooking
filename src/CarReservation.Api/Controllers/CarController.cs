@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CarReservation.Api.Controllers
 {
     [ApiController]
-    [Route("v1/[controller]")]
+    [Route("api/v1/[controller]")]
     public class CarController : ControllerBase
     {
         private readonly IValidator<CarRequest> validator;
@@ -20,15 +20,18 @@ namespace CarReservation.Api.Controllers
         }
 
         [HttpGet]
+        [Route("")]
         public IEnumerable<CarResponse> GetAll() => carService.GetAllCars();
 
-        [HttpGet("{car_id}")]
-        public IActionResult GetById([FromQuery] string car_id)
+        [HttpGet]
+        [Route("{car_id}")]
+        public IActionResult GetById(string car_id)
         {
             if(string.IsNullOrEmpty(car_id))
                 return BadRequest($"Query parameter {nameof(car_id)} cannot be null or empty.");
 
-            return Ok();
+            var car = carService.GetCar(car_id);
+            return car == null ? NotFound() : Ok(car);
         }
 
         [HttpPost]
@@ -43,11 +46,12 @@ namespace CarReservation.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
 
             var carId = carService.AddCar(carRequest);
-            return Accepted(new { carId });
+            return Accepted(new CarAddedResponse(carId));
         }
 
-        [HttpPut("{car_id}")]
-        public async Task<IActionResult> UpdateCar([FromQuery] string car_id, [FromBody] CarRequest carRequest)
+        [HttpPut]
+        [Route("{car_id}")]
+        public async Task<IActionResult> UpdateCar(string car_id, [FromBody] CarRequest carRequest)
         {
             if (string.IsNullOrEmpty(car_id))
                 return BadRequest($"Query parameter {nameof(car_id)} cannot be null or empty.");
@@ -60,16 +64,33 @@ namespace CarReservation.Api.Controllers
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
 
-            return Accepted();
+            try
+            {
+                var updatedCar = carService.UpdateCar(car_id, carRequest);
+                return Accepted();
+            }
+            catch (Exception e) 
+            {
+                return BadRequest(e.Message);
+            }
         }
 
-        [HttpDelete("{car_id}")]
-        public IActionResult RemoveById([FromQuery] string car_id)
+        [HttpDelete]
+        [Route("{car_id}")]
+        public IActionResult RemoveById(string car_id)
         {
             if (string.IsNullOrEmpty(car_id))
                 return BadRequest($"Query parameter {nameof(car_id)} cannot be null or empty.");
 
-            return NoContent();
+            try
+            {
+                carService.DeleteCar(car_id);
+                return NoContent();
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

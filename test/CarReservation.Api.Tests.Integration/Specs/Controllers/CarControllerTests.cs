@@ -3,6 +3,7 @@ using CarReservation.Api.Tests.Common.Builders;
 using CarReservation.Api.Tests.Integration.Config;
 using FluentAssertions;
 using Newtonsoft.Json;
+using NUnit.Framework;
 using System.Net;
 using System.Text;
 using System.Text.Json;

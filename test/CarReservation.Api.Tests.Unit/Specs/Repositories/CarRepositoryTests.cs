@@ -67,7 +67,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 var repository = new CarRepository();
 
-                Func<string> action = () => repository.Add(null);
+                Func<string> action = () => repository.Add(null!);
 
                 action.Should().Throw<ArgumentException>().WithParameterName("entity");
             }
@@ -105,7 +105,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 var repository = new CarRepository();
 
-                Func<Car> action = () => repository.Update(null);
+                Func<Car> action = () => repository.Update(null!);
 
                 action.Should().Throw<ArgumentException>().WithParameterName("entity");
             }

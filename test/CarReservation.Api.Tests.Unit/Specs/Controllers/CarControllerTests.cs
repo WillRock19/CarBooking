@@ -45,7 +45,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
             [Test]
             public async Task WhenCarRequestIsNull_ReturnsUnprocessableEntityWithMessage()
             {
-                var result = await carController.AddCar(null);
+                var result = await carController.AddCar(null!);
                 var resultAsBadRequest = (UnprocessableEntityObjectResult)result;
 
                 resultAsBadRequest.StatusCode.Should().Be(422);
@@ -94,7 +94,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
             [Test]
             public async Task WhenCarRequestIsNull_ReturnsUnprocessableEntityWithMessage()
             {
-                var result = await carController.UpdateCar("C10", null);
+                var result = await carController.UpdateCar("C10", null!);
                 var resultAsBadRequest = (UnprocessableEntityObjectResult)result;
 
                 resultAsBadRequest.StatusCode.Should().Be(422);

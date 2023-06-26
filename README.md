@@ -1,4 +1,4 @@
-![CI](https://github.com/WillRock19/CarBooking/workflows/CI/badge.svg)
+[![dotnet package](https://github.com/WillRock19/CarBooking/actions/workflows/build_and_run_tests.yml/badge.svg?branch=master)](https://github.com/WillRock19/CarBooking/actions/workflows/build_and_run_tests.yml)
 
 # Introduction
 

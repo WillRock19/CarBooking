@@ -1,3 +1,5 @@
+![CI](https://github.com/WillRock19/CarBooking/workflows/CI/badge.svg)
+
 # Introduction
 
 Write what this project is about.

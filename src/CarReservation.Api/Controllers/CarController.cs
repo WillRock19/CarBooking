@@ -3,6 +3,7 @@ using CarReservation.Api.Models.DTO.Request;
 using CarReservation.Api.Models.DTO.Response;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace CarReservation.Api.Controllers
 {
@@ -21,10 +22,14 @@ namespace CarReservation.Api.Controllers
 
         [HttpGet]
         [Route("")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
         public IEnumerable<CarResponse> GetAll() => carService.GetAllCars();
 
         [HttpGet]
         [Route("{car_id}")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.NotFound)]
         public IActionResult GetById(string car_id)
         {
             if(string.IsNullOrEmpty(car_id))
@@ -35,6 +40,9 @@ namespace CarReservation.Api.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType((int)HttpStatusCode.Created)]
+        [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> AddCar([FromBody] CarRequest carRequest)
         {
             if (carRequest == null)
@@ -46,11 +54,14 @@ namespace CarReservation.Api.Controllers
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
 
             var carId = carService.AddCar(carRequest);
-            return Accepted(new { carId });
+            return Created($"api/v1/{carId}", new { carId });
         }
 
         [HttpPut]
         [Route("{car_id}")]
+        [ProducesResponseType((int)HttpStatusCode.Accepted)]
+        [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public async Task<IActionResult> UpdateCar(string car_id, [FromBody] CarRequest carRequest)
         {
             if (string.IsNullOrEmpty(car_id))
@@ -77,6 +88,8 @@ namespace CarReservation.Api.Controllers
 
         [HttpDelete]
         [Route("{car_id}")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         public IActionResult RemoveById(string car_id)
         {
             if (string.IsNullOrEmpty(car_id))

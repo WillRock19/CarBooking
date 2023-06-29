@@ -1,5 +1,6 @@
 ﻿using CarReservation.Api.Models.DTO.Request;
 using CarReservation.Api.Models.Validations;
+using CarReservation.Api.Tests.Unit.Builders;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -13,7 +14,18 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Validations
         {
             _carRequestValidator = new CarRequestValidator();
         }
-        
+
+        [Test]
+        public void Validator_WhenCarRequestIsValid_ShouldNotReturnErrorMessage()
+        {
+            var carRequest = new CarRequestBuilder().WithMake("Some make").WithModel("Some model").Build();
+
+            var result = _carRequestValidator.Validate(carRequest);
+
+            result.IsValid.Should().BeTrue();
+            result.Errors.Should().BeEmpty();
+        }
+
         [Test]
         [TestCase(null)]
         [TestCase("")]

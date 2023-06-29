@@ -9,16 +9,17 @@ using NUnit.Framework;
 
 namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
 {
-    public class MappingProfileTests
+    public class CarProfileTests
     {
         private readonly MapperConfiguration configuration;
         private readonly IMapper mapper;
 
-        public MappingProfileTests()
+        public CarProfileTests()
         {
             configuration = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile<MappingProfile>();
+                cfg.AddProfile<CarProfile>();
+                cfg.AddProfile<ReservationProfile>();
             });
 
             mapper = configuration.CreateMapper();

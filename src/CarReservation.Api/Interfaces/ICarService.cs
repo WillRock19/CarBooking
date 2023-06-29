@@ -14,5 +14,7 @@ namespace CarReservation.Api.Interfaces
         CarResponse UpdateCar(string carId, CarRequest carRequest);
 
         void DeleteCar(string carId);
+
+        Task<(int? reservationId, string errorMessage)> ReserveCarAsync(ReservationRequest reservationRequest);
     }
 }

@@ -14,15 +14,17 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
     public class CarControllerTests
     {
         private readonly Mock<IValidator<CarRequest>> carRequestValidatorMock;
+        private readonly Mock<IValidator<ReservationRequest>> reservationRequestValidatorMock;
         private readonly Mock<ICarService> carServiceMock;
         private readonly CarController carController;
 
         public CarControllerTests()
         {
             carRequestValidatorMock = new Mock<IValidator<CarRequest>>();
+            reservationRequestValidatorMock = new Mock<IValidator<ReservationRequest>>();
             carServiceMock = new Mock<ICarService>();
 
-            carController = new CarController(carServiceMock.Object, carRequestValidatorMock.Object);
+            carController = new CarController(carServiceMock.Object, carRequestValidatorMock.Object, reservationRequestValidatorMock.Object);
         }
 
         internal class GetById : CarControllerTests
@@ -45,7 +47,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
             [Test]
             public async Task WhenCarRequestIsNull_ReturnsUnprocessableEntityWithMessage()
             {
-                var result = await carController.AddCar(null!);
+                var result = await carController.CreateCar(null!);
                 var resultAsBadRequest = (UnprocessableEntityObjectResult)result;
 
                 resultAsBadRequest.StatusCode.Should().Be(422);
@@ -69,7 +71,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
                 carRequestValidatorMock.Setup(x => x.ValidateAsync(carRequest, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(validationResultWithError);
 
-                var result = await carController.AddCar(carRequest);
+                var result = await carController.CreateCar(carRequest);
                 
                 var resultAsBadRequest = (BadRequestObjectResult)result;
                 resultAsBadRequest.StatusCode.Should().Be(400);

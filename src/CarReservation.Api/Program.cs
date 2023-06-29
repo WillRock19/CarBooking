@@ -14,10 +14,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddValidatorsFromAssemblyContaining<CarRequestValidator>();
 builder.Services.AddSingleton<ICarRepository, CarRepository>();
+builder.Services.AddSingleton<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
+
 builder.Services.AddAutoMapper(config =>
 {
-    config.AddProfile<MappingProfile>();
+    config.AddProfile<CarProfile>();
+    config.AddProfile<ReservationProfile>();
 });
 
 var app = builder.Build();

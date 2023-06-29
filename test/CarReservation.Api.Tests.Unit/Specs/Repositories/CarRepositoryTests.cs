@@ -11,7 +11,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
         internal class GetAll : CarRepositoryTests
         {
             [Test]
-            public void WhenRepositoryCars_ReturnsAllCars()
+            public void WhenRepositoryHasCars_ReturnsAllCars()
             {
                 var repository = new CarRepository();
 
@@ -63,7 +63,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
         internal class AddCar : CarRepositoryTests
         {
             [Test]
-            public void WhenReceivingNull_ThrowsArgumentException()
+            public void WhenReceivingNullCar_ThrowsArgumentException()
             {
                 var repository = new CarRepository();
 
@@ -73,7 +73,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             }
 
             [Test]
-            public void WhenReceivingSingleCar_AddsCarToDatabaseWithCorrectId()
+            public void WhenAddingSingleCar_AddsCarToDatabaseWithCorrectId()
             {
                 var repository = new CarRepository();
                 var originalCar = new CarBuilder().Build();
@@ -84,7 +84,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             }
 
             [Test]
-            public void WhenReceivingMultipleCars_AddsCarsToDatabaseWithCorrectIds()
+            public void WhenAddingMultipleCars_AddsCarsToDatabaseWithCorrectIds()
             {
                 var repository = new CarRepository();
                 var car1 = new CarBuilder().Build();
@@ -101,7 +101,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
         internal class UpdateCar : CarRepositoryTests 
         {
             [Test]
-            public void WhenReceivingNull_ThrowsArgumentException()
+            public void WhenReceivingNullCar_ThrowsArgumentException()
             {
                 var repository = new CarRepository();
 

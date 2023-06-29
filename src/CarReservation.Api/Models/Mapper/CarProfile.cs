@@ -5,9 +5,9 @@ using CarReservation.Api.Models.DTO.Response;
 
 namespace CarReservation.Api.Models.Mapper
 {
-    public class MappingProfile : Profile
+    public class CarProfile : Profile
     {
-        public MappingProfile()
+        public CarProfile()
         {
             CreateMap<CarRequest, Car>()
                 .ForMember(dest => dest.Id, src => src.Ignore())

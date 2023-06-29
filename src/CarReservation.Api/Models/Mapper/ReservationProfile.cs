@@ -1,0 +1,20 @@
+﻿using AutoMapper;
+using CarReservation.Api.Models.Domain;
+using CarReservation.Api.Models.DTO.Request;
+
+namespace CarReservation.Api.Models.Mapper
+{
+    public class ReservationProfile : Profile
+    {
+        public ReservationProfile()
+        {
+            CreateMap<ReservationRequest, Reservation>()
+                .ForMember(dest => dest.Id, src => src.Ignore())
+                .ForMember(dest => dest.CarId, src => src.Ignore())
+                .ForMember(dest => dest.DurationInMinutes, src => src.MapFrom(request => request.DurationInMinutes))
+                .ForMember(dest => dest.InitialDate, src => src.MapFrom(request => request.ReservationDate))
+                .ForMember(dest => dest.EndDate, src => src.MapFrom(request => request.ReservationDate.AddMinutes(request.DurationInMinutes)))
+                .ConstructUsing(src => new Reservation(0, string.Empty, src.ReservationDate, src.ReservationDate.AddMinutes(src.DurationInMinutes), src.DurationInMinutes));
+        }
+    }
+}

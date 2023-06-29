@@ -2,8 +2,8 @@
 {
     public class CarResponse
     {
-        public required string Id { get; set; }
-        public required string Make { get; set; }
-        public required string Model { get; set; }
+        public required string Id { get; init; }
+        public required string Make { get; init; }
+        public required string Model { get; init; }
     }
 }

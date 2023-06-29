@@ -58,7 +58,7 @@ namespace CarReservation.Api.Services
 
         public void DeleteCar(string carId) => carRepository.Delete(carId);
 
-        public async Task<(int? reservationId, string errorMessage)> ReserveCarAsync(ReservationRequest reservationRequest)
+        public async Task<ReserveCarResponse> ReserveCarAsync(ReservationRequest reservationRequest)
         {
             var reservation = mapper.Map<Reservation>(reservationRequest);
 
@@ -66,7 +66,7 @@ namespace CarReservation.Api.Services
                 .ValidateAsync(reservation);
             
             if(!validationResult.IsValid)
-                return (null, BuildReservationValidErrorMessage(validationResult.Errors));
+                return new ReserveCarResponse(null, BuildReservationValidErrorMessage(validationResult.Errors));
 
             var carsReservedInIntervalSet = new HashSet<string>(reservationRepository
                 .FindCarsReservedInInterval(reservation.InitialDate, reservation.EndDate));
@@ -77,12 +77,13 @@ namespace CarReservation.Api.Services
                 .ToList();
 
             if (!carsAvailableForReservation.Any()) 
-                return (null, "There's no car available for the desired date and time.");
+                return new ReserveCarResponse(null, "There's no car available for the desired date and time.");
 
             var carToReserve = carsAvailableForReservation.First();
             var reservationId = reservationRepository.Add(reservation with { CarId = carToReserve.Id });
+            var successMessage = $"Reservation successfully created for date {reservation.InitialDate}. Your reservation ID is: {reservationId}.";
 
-            return (reservationId, string.Empty);
+            return new ReserveCarResponse(reservationId, successMessage);
         }
 
         private string BuildReservationValidErrorMessage(List<ValidationFailure> validationFailures) 

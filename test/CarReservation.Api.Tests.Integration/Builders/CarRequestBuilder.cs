@@ -1,6 +1,6 @@
 ﻿using CarReservation.Api.Models.DTO.Request;
 
-namespace CarReservation.Api.Tests.Common.Builders
+namespace CarReservation.Api.Tests.Integration.Builders
 {
     internal class CarRequestBuilder
     {

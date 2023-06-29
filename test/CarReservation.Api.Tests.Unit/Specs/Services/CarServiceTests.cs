@@ -63,8 +63,8 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var result = await service.ReserveCarAsync(fakeReservationRequest);
 
                 // Assert
-                result.reservationId.Should().BeNull();
-                result.errorMessage.Should().Be(expectedErrorMessage);
+                result.ReservationId.Should().BeNull();
+                result.Message.Should().Be(expectedErrorMessage);
             }
 
             [Test]
@@ -95,8 +95,8 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var result = await service.ReserveCarAsync(fakeReservationRequest);
 
                 // Assert
-                result.reservationId.Should().BeNull();
-                result.errorMessage.Should().Be(expectedErrorMessage);
+                result.ReservationId.Should().BeNull();
+                result.Message.Should().Be(expectedErrorMessage);
             }
 
             [Test]
@@ -133,8 +133,8 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var result = await service.ReserveCarAsync(fakeReservationRequest);
 
                 // Assert
-                result.reservationId.Should().Be(reservationId);
-                result.errorMessage.Should().BeEmpty();
+                result.ReservationId.Should().Be(reservationId);
+                result.Message.Should().BeEmpty();
             }
         }
     }

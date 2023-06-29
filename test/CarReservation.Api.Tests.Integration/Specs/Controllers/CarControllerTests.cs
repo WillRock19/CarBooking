@@ -1,7 +1,10 @@
 ﻿using CarReservation.Api.Models.DTO.Response;
-using CarReservation.Api.Tests.Common.Builders;
+using CarReservation.Api.Tests.Integration.Builders;
 using CarReservation.Api.Tests.Integration.Config;
 using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System.Net;
@@ -116,5 +119,161 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             var carFromDatabase = await HttpClient.GetAsync($"{EndpointBaseRoute}/{cardCreatedId}");
             carFromDatabase.StatusCode.Should().Be(HttpStatusCode.NotFound);
         }
+
+        [Test]
+        public async Task Client_WhenTryingToReserveCarForSpecificDate_ShouldBeAbleToMakeTheReservion() 
+        {
+            // Assert
+            var carRequest = new CarRequestBuilder().WithMake("First Make").Build();
+            var createCarPostContent = new StringContent(JsonConvert.SerializeObject(carRequest), Encoding.UTF8, AcceptedContentType);
+
+            var createCarResult = await HttpClient.PostAsync(EndpointBaseRoute, createCarPostContent);
+            createCarResult.EnsureSuccessStatusCode();
+
+            var reservationDate = DateTime.UtcNow.AddHours(5);
+            var reservationRequest = new ReservationRequestBuilder()
+                .WithReservationDate(reservationDate)
+                .WithDurationInMinutes(60)
+                .Build();
+
+            var createReservationPostContent = new StringContent(JsonConvert.SerializeObject(reservationRequest), Encoding.UTF8, AcceptedContentType);
+
+            // Act
+            var createReservationResult = await HttpClient.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent);
+            var resultContent = JsonConvert.DeserializeObject<ReserveCarResponse>(await createReservationResult.Content.ReadAsStringAsync());
+
+            // Assert
+            createReservationResult.StatusCode.Should().Be(HttpStatusCode.OK);
+            resultContent?.ReservationId.Should().NotBeNull();
+            resultContent?.Message.Should().Contain($"Reservation successfully created for date {reservationDate}. Your reservation ID is: ");
+        }
+
+        [Test]
+        public async Task Client_WhenTryingToMakeMultipleReservationsAndThereAreAvailableCars_ShouldBeAbleToMakeTheReservations()
+        {
+            // Assert
+            var carRequest1 = new CarRequestBuilder().WithMake("Maybe car to be reserved 1").Build();
+            var carRequest2 = new CarRequestBuilder().WithMake("Maybe car to be reserved 2").Build();
+
+            var createCarPostContent1 = new StringContent(JsonConvert.SerializeObject(carRequest1), Encoding.UTF8, AcceptedContentType);
+            var createCarPostContent2 = new StringContent(JsonConvert.SerializeObject(carRequest2), Encoding.UTF8, AcceptedContentType);
+
+            var createCarResult1 = await HttpClient.PostAsync(EndpointBaseRoute, createCarPostContent1);
+            var createCarResult2 = await HttpClient.PostAsync(EndpointBaseRoute, createCarPostContent2);
+
+            createCarResult1.EnsureSuccessStatusCode();
+            createCarResult2.EnsureSuccessStatusCode();
+
+            var reservationDate1 = DateTime.UtcNow.AddHours(5);
+            var reservationDate2 = reservationDate1.AddHours(5);
+
+            var reservationRequest1 = new ReservationRequestBuilder().WithReservationDate(reservationDate1).WithDurationInMinutes(55).Build();
+            var reservationRequest2 = new ReservationRequestBuilder().WithReservationDate(reservationDate2).WithDurationInMinutes(87).Build();
+
+            var createReservationPostContent1 = new StringContent(JsonConvert.SerializeObject(reservationRequest1), Encoding.UTF8, AcceptedContentType);
+            var createReservationPostContent2 = new StringContent(JsonConvert.SerializeObject(reservationRequest2), Encoding.UTF8, AcceptedContentType);
+
+            // Act
+            var createReservationResult1 = await HttpClient.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent1);
+            var createReservationResult2 = await HttpClient.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent2);
+
+            var resultContent1 = JsonConvert.DeserializeObject<ReserveCarResponse>(await createReservationResult1.Content.ReadAsStringAsync());
+            var resultContent2 = JsonConvert.DeserializeObject<ReserveCarResponse>(await createReservationResult2.Content.ReadAsStringAsync());
+
+            // Assert
+            createReservationResult1.EnsureSuccessStatusCode();
+            createReservationResult2.EnsureSuccessStatusCode();
+
+            resultContent1?.ReservationId.Should().NotBeNull();
+            resultContent1?.Message.Should().Contain($"Reservation successfully created for date {reservationDate1}. Your reservation ID is: ");
+
+            resultContent2?.ReservationId.Should().NotBeNull();
+            resultContent2?.Message.Should().Contain($"Reservation successfully created for date {reservationDate2}. Your reservation ID is: ");
+        }
+
+        [Test]
+        public async Task Client_WhenTryingToMakeReservationButNoCarsWhereRegistered_ShouldReceiveAnErrorMessage()
+        {
+            // Assert
+            var newTestServerWithEmptyDatabase = CreateNewTestServerToGuaranteeDatabaseIsEmpty();
+            var newTestClient = newTestServerWithEmptyDatabase.CreateClient();
+
+            var reservationDate = DateTime.UtcNow.AddHours(5);
+            var reservationRequest = new ReservationRequestBuilder()
+                .WithReservationDate(reservationDate)
+                .WithDurationInMinutes(60)
+                .Build();
+
+            var createReservationPostContent = new StringContent(JsonConvert.SerializeObject(reservationRequest), Encoding.UTF8, AcceptedContentType);
+
+            // Act
+            var createReservationResult = await newTestClient.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent);
+            var resultContent = JsonConvert.DeserializeObject<ReserveCarResponse>(await createReservationResult.Content.ReadAsStringAsync());
+
+            // Assert
+            createReservationResult.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            resultContent?.ReservationId.Should().BeNull();
+            resultContent?.Message.Should().Contain($"There's no car available for the desired date and time.");
+        }
+
+        [Test]
+        public async Task Client_WhenTryingToMakeReservationButNoCarsAreAvailable_ShouldReceiveErrorMessage()
+        {
+            // Assert
+            var newTestServerWithEmptyDatabase = CreateNewTestServerToGuaranteeDatabaseIsEmpty();
+            var newTestClient = newTestServerWithEmptyDatabase.CreateClient();
+
+            var carRequest = new CarRequestBuilder().WithMake("First Make").Build();
+            var createCarPostContent = new StringContent(JsonConvert.SerializeObject(carRequest), Encoding.UTF8, AcceptedContentType);
+
+            var createCarResult = await newTestClient.PostAsync(EndpointBaseRoute, createCarPostContent);
+            createCarResult.EnsureSuccessStatusCode();
+
+            var reservationDate = DateTime.UtcNow.AddHours(5);
+            var firstReservationRequest = new ReservationRequestBuilder()
+                .WithReservationDate(reservationDate)
+                .WithDurationInMinutes(60)
+                .Build();
+
+            var secondReservationRequest = new ReservationRequestBuilder()
+                .WithReservationDate(reservationDate)
+                .WithDurationInMinutes(120)
+                .Build();
+
+            var firstReservationPostContent = new StringContent(JsonConvert.SerializeObject(firstReservationRequest), Encoding.UTF8, AcceptedContentType);
+            var secondReservationPostContent = new StringContent(JsonConvert.SerializeObject(secondReservationRequest), Encoding.UTF8, AcceptedContentType);
+
+            var firstReservationResult = await newTestClient.PostAsync($"{EndpointBaseRoute}/reservations", firstReservationPostContent);
+            firstReservationResult.EnsureSuccessStatusCode();
+
+            // Act
+            var secondReservationResult = await newTestClient.PostAsync($"{EndpointBaseRoute}/reservations", secondReservationPostContent);
+            var resultContent = JsonConvert.DeserializeObject<ReserveCarResponse>(await secondReservationResult.Content.ReadAsStringAsync());
+
+            // Assert
+            secondReservationResult.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+            resultContent?.ReservationId.Should().BeNull();
+            resultContent?.Message.Should().Contain($"There's no car available for the desired date and time.");
+        }
+
+        [Test]
+        public async Task Client_ShouldBeAbleToRetrieveAllUpcomingReservationsWithoutInformingTheDate()
+        {
+            false.Should().BeTrue();
+        }
+
+        [Test]
+        public async Task Client_ShouldBeAbleToRetrieveAllUpcomingReservationsUntilSpecificDate()
+        {
+            false.Should().BeTrue();
+        }
+
+        private TestServer CreateNewTestServerToGuaranteeDatabaseIsEmpty() => 
+            new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(builder =>
+                {
+                    builder.UseEnvironment("Testing");
+                })
+                .Server;
     }
 }

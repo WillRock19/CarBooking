@@ -108,15 +108,13 @@ namespace CarReservation.Api.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("/reservations")]
+        [HttpGet("reservations")]
         public IActionResult GetUpcomingReservations([FromQuery] DateTime untilDate) 
         {
             return Ok();
         }
 
-        [HttpPost]
-        [Route("/reservations")]
+        [HttpPost("reservations")]
         public async Task<IActionResult> CreateReservation([FromBody] ReservationRequest reservationRequest)
         {
             if (reservationRequest == null)
@@ -128,7 +126,8 @@ namespace CarReservation.Api.Controllers
             if (!validationResult.IsValid)
                 return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
 
-            return Ok();
+            var response = await carService.ReserveCarAsync(reservationRequest);
+            return response.ReservationId.HasValue ? Ok(response) : BadRequest(response);
         }
     }
 }

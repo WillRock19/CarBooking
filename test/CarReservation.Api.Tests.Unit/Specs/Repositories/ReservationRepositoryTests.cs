@@ -15,7 +15,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 var repository = new ReservationRepository();
 
-                Func<int> action = () => repository.Add(null!);
+                Func<Guid> action = () => repository.Add(null!);
 
                 action.Should().Throw<ArgumentException>().WithParameterName("entity");
             }

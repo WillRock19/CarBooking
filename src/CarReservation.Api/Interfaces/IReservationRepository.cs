@@ -4,9 +4,9 @@ namespace CarReservation.Api.Interfaces
 {
     public interface IReservationRepository
     {
-        int Add(Reservation entity);
+        Guid Add(Reservation entity);
 
-        Reservation? GetById(int reservationId);
+        Reservation? GetById(Guid id);
 
         IEnumerable<string> FindCarsReservedInInterval(DateTime reservationBeginning, DateTime reservationEnding);
     }

@@ -8,8 +8,8 @@ namespace CarReservation.Api.Tests.Integration.Config
 {
     public class GlobalSetup
     {
-        protected TestServer TestServer;
-        protected HttpClient HttpClient;
+        protected TestServer GlobalTestServer;
+        protected HttpClient GlobalHttpClient;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -20,15 +20,15 @@ namespace CarReservation.Api.Tests.Integration.Config
                     builder.UseEnvironment("Testing");
                 });
 
-            TestServer = factory.Server;
-            HttpClient = factory.CreateClient();
+            GlobalTestServer = factory.Server;
+            GlobalHttpClient = factory.CreateClient();
         }
 
         [OneTimeTearDown]
         public void OneTimeTearDown() 
         {
-            HttpClient?.Dispose();
-            TestServer?.Dispose();
+            GlobalHttpClient?.Dispose();
+            GlobalTestServer?.Dispose();
         }
     }
 }

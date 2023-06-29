@@ -35,7 +35,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
 
             var result = mapper.Map<Reservation>(reservationRequest);
 
-            result.Id.Should().Be(0);
+            result.Id.Should().BeEmpty();
             result.CarId.Should().BeEmpty();
         }
 

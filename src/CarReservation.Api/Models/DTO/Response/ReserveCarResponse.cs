@@ -2,13 +2,13 @@
 {
     public class ReserveCarResponse
     {
-        public ReserveCarResponse(int? reservationId, string message)
+        public ReserveCarResponse(Guid? reservationId, string message)
         {
             ReservationId = reservationId;
             Message = message;
         }
 
-        public int? ReservationId { get; init; }
+        public Guid? ReservationId { get; init; }
         public string Message { get; init; }
     }
 }

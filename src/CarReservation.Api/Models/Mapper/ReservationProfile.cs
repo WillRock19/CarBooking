@@ -13,7 +13,7 @@ namespace CarReservation.Api.Models.Mapper
                 .ForMember(dest => dest.CarId, src => src.Ignore())
                 .ForMember(dest => dest.DurationInMinutes, src => src.MapFrom(request => TimeSpan.FromMinutes(request.DurationInMinutes)))
                 .ForMember(dest => dest.InitialDate, src => src.MapFrom(request => request.ReservationDate))
-                .ConstructUsing(src => new Reservation(0, string.Empty, src.ReservationDate, TimeSpan.FromMinutes(src.DurationInMinutes)));
+                .ConstructUsing(src => new Reservation(Guid.Empty, string.Empty, src.ReservationDate, TimeSpan.FromMinutes(src.DurationInMinutes)));
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace CarReservation.Api.Models.Domain
 {
-    public record Reservation(int Id, string CarId, DateTime InitialDate, TimeSpan DurationInMinutes) 
+    public record Reservation(Guid Id, string CarId, DateTime InitialDate, TimeSpan DurationInMinutes) 
     {
         public DateTime EndDate { get; } = InitialDate + DurationInMinutes;
 

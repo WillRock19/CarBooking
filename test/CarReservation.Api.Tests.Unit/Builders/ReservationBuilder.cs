@@ -4,17 +4,16 @@ namespace CarReservation.Api.Tests.Unit.Builders
 {
     internal class ReservationBuilder
     {
-        private int reservationId;
+        private Guid reservationId;
         private string? carId;
         private DateTime? initialDate;
         private DateTime? endDate;
         private TimeSpan? durationInMinutes;
         private bool emptyInitialDate;
 
-        internal ReservationBuilder WithId(int reservationId)
+        public ReservationBuilder()
         {
-            this.reservationId = reservationId;
-            return this;
+            reservationId = Guid.Empty;
         }
 
         internal ReservationBuilder WithCarId(string carId)

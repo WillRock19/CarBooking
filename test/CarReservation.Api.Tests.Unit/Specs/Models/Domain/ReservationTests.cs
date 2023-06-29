@@ -16,7 +16,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Domain
                 var durationInMinutes = TimeSpan.FromMinutes(60);
                 var expectedEndDate = initialDate + durationInMinutes;
 
-                Reservation reservation = new(1, string.Empty, initialDate, durationInMinutes);
+                Reservation reservation = new(Guid.NewGuid(), string.Empty, initialDate, durationInMinutes);
 
                 reservation.EndDate.Should().Be(expectedEndDate);
             }

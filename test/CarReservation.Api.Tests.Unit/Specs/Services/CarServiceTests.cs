@@ -103,30 +103,33 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             public async Task WhenThereAreCarAvailables_CreatesReservationAndReturnIdWithSuccessMessage()
             {
                 // Arrange
-                const string unavailableCarId = "C1";
-                const string availableCarId = "C2";
-                const int reservationId = 1;
+                const string UnavailableCarId = "C1";
+                const string AvailableCarId = "C2";
+                
+                var reservationId = Guid.NewGuid();
+                var reservationInitialDate = DateTime.UtcNow;
+                var expectedSuccessMessage = $"Reservation successfully created for date {reservationInitialDate}. Your reservation ID is: {reservationId}.";
 
                 var fakeReservationRequest = new ReservationRequestBuilder().Build();
-                var fakeInvalidReservation = new ReservationBuilder().WithCarId(availableCarId).Build();
+                var fakeReservation = new ReservationBuilder().WithCarId(AvailableCarId).Build();
                 var reservationRequestValidationResult = new ValidationResult();
-                
-                var unavailableCarFromDatabase = new CarBuilder().WithId(unavailableCarId).Build();
-                var availableCarFromDatabase = new CarBuilder().WithId(availableCarId).Build();
+
+                var unavailableCarFromDatabase = new CarBuilder().WithId(UnavailableCarId).Build();
+                var availableCarFromDatabase = new CarBuilder().WithId(AvailableCarId).Build();
 
                 mapperMock.Setup(x => x.Map<Reservation>(fakeReservationRequest))
-                    .Returns(fakeInvalidReservation);
+                    .Returns(fakeReservation);
 
-                reservationValidatorMock.Setup(x => x.ValidateAsync(fakeInvalidReservation, It.IsAny<CancellationToken>()))
+                reservationValidatorMock.Setup(x => x.ValidateAsync(fakeReservation, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(reservationRequestValidationResult);
 
                 reservationRepositoryMock.Setup(x => x.FindCarsReservedInInterval(It.IsAny<DateTime>(), It.IsAny<DateTime>()))
-                    .Returns(new List<string>() { unavailableCarId });
+                    .Returns(new List<string>() { UnavailableCarId });
 
                 carRepositoryMock.Setup(x => x.GetAll())
                     .Returns(new List<Car>() { unavailableCarFromDatabase, availableCarFromDatabase });
 
-                reservationRepositoryMock.Setup(x => x.Add(It.Is<Reservation>(reservation => reservation.CarId == availableCarId)))
+                reservationRepositoryMock.Setup(x => x.Add(It.Is<Reservation>(reservation => reservation.CarId == AvailableCarId)))
                     .Returns(reservationId);
 
                 // Act
@@ -134,7 +137,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
 
                 // Assert
                 result.ReservationId.Should().Be(reservationId);
-                result.Message.Should().BeEmpty();
+                result.Message.Should().Be(expectedSuccessMessage);
             }
         }
     }

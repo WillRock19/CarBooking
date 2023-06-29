@@ -5,30 +5,26 @@ namespace CarReservation.Api.Repositories
 {
     public class ReservationRepository : IReservationRepository
     {
-        private int LatestRegisterCount;
-        private readonly Dictionary<int, Reservation> Database;
+        private readonly Dictionary<Guid, Reservation> Database;
 
         public ReservationRepository()
         {
-            LatestRegisterCount = 0;
             Database = new();
         }
 
-        public int Add(Reservation entity) 
+        public Guid Add(Reservation entity) 
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
 
-            var entityId = LatestRegisterCount + 1;
+            var entityId = Guid.NewGuid();
 
             Database.Add(entityId, entity with { Id = entityId });
-            LatestRegisterCount = entityId;
-
             return entityId;
         }
 
-        public Reservation? GetById(int reservationId)
+        public Reservation? GetById(Guid id)
         {
-            Database.TryGetValue(reservationId, out var entity);
+            Database.TryGetValue(id, out var entity);
             return entity;
         }
 

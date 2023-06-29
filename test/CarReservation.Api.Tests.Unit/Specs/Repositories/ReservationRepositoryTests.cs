@@ -144,22 +144,20 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             private Reservation ReservationInsideInterval() 
             {
                 var initialDateInsideDesiredInterval = intervalBeginning.AddMinutes(5);
-                var endDateInsideDesiredInterval = initialDateInsideDesiredInterval.AddMinutes(-5);
 
                 return new ReservationBuilder()
                     .WithInitialDate(initialDateInsideDesiredInterval)
-                    .WithEndDate(endDateInsideDesiredInterval)
+                    .WithDurationInMinutes(20)
                     .Build();
             }
 
             private Reservation ReservationOutsideInterval()
             {
                 var initialDateOutsideDesiredInterval = intervalEnding.AddHours(1);
-                var endDateOutsideDesiredInterval = initialDateOutsideDesiredInterval.AddHours(1);
 
                 return new ReservationBuilder()
                     .WithInitialDate(initialDateOutsideDesiredInterval)
-                    .WithEndDate(endDateOutsideDesiredInterval)
+                    .WithDurationInMinutes(120)
                     .Build();
             }
         }

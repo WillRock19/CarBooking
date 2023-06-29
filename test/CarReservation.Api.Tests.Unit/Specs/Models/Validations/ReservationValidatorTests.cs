@@ -50,7 +50,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Validations
             var result = await _reservationValidator.ValidateAsync(invalidReservation);
 
             result.IsValid.Should().BeFalse();
-            result.Errors.Should().Contain(e => e.ErrorMessage == "'Duration In Minutes' must be greater than '0'.");
+            result.Errors.Should().Contain(e => e.ErrorMessage == "'Duration In Minutes' must be greater than '00:00:00'.");
         }
 
         [Test]

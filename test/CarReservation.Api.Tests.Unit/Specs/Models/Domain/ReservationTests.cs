@@ -9,7 +9,17 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Domain
     {
         internal class Constructor : ReservationTests 
         {
-        
+            [Test]
+            public void WhenReceivingInitialDateAndDuration_ShouldSetEndDate() 
+            {
+                var initialDate = DateTime.UtcNow;
+                var durationInMinutes = TimeSpan.FromMinutes(60);
+                var expectedEndDate = initialDate + durationInMinutes;
+
+                Reservation reservation = new(1, string.Empty, initialDate, durationInMinutes);
+
+                reservation.EndDate.Should().Be(expectedEndDate);
+            }
         }
 
         internal class StartsInTwentyFourHoursOrLess : ReservationTests 
@@ -67,24 +77,6 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Domain
             public void WhenDurationIsHigherThanTwoHours_ReturnsFalse(int durationInMinutes)
             {
                 var reservation = new ReservationBuilder().WithDurationInMinutes(durationInMinutes).Build();
-
-                reservation.HasDurationOfTwoHoursTops().Should().BeFalse();
-            }
-
-            [Test]
-            public void WhenDurationIsLessThanTwoHoursButEndDateIsHigherThanTwoHours_ReturnsFalse()
-            {
-
-
-                var twoHoursInMinutes = 120;
-                var initialDate = DateTime.UtcNow;
-                var endDate = initialDate.AddMinutes(twoHoursInMinutes + 1);
-
-                var reservation = new ReservationBuilder()
-                    .WithInitialDate(initialDate)
-                    .WithEndDate(endDate)
-                    .WithDurationInMinutes(twoHoursInMinutes)
-                    .Build();
 
                 reservation.HasDurationOfTwoHoursTops().Should().BeFalse();
             }

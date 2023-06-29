@@ -8,7 +8,7 @@ namespace CarReservation.Api.Tests.Unit.Builders
         private string? carId;
         private DateTime? initialDate;
         private DateTime? endDate;
-        private int? durationInMinutes;
+        private TimeSpan? durationInMinutes;
         private bool emptyInitialDate;
 
         internal ReservationBuilder WithId(int reservationId)
@@ -29,15 +29,9 @@ namespace CarReservation.Api.Tests.Unit.Builders
             return this;
         }
 
-        internal ReservationBuilder WithEndDate(DateTime endDate)
-        {
-            this.endDate = endDate;
-            return this;
-        }
-
         internal ReservationBuilder WithDurationInMinutes(int durationInMinutes)
         {
-            this.durationInMinutes = durationInMinutes;
+            this.durationInMinutes = TimeSpan.FromMinutes(durationInMinutes);
             return this;
         }
 
@@ -56,15 +50,14 @@ namespace CarReservation.Api.Tests.Unit.Builders
                 reservationId,
                 carId ?? $"C{new Random().Next()}",
                 initialDate ?? defaultInitialDate,
-                endDate ?? defaultInitialDate.AddMinutes(durationOfReservation),
                 DurationOfCustomizedInterval() ?? durationOfReservation
             );
         } 
 
-        private int RandomMinutesUpToTwoHours() => new Random().Next(1, 120);
+        private TimeSpan RandomMinutesUpToTwoHours() => TimeSpan.FromMinutes(new Random().Next(1, 120));
 
-        private int? DurationOfCustomizedInterval() => initialDate != null && endDate != null 
-            ? Convert.ToInt32((endDate.Value - initialDate.Value).TotalMinutes)
+        private TimeSpan? DurationOfCustomizedInterval() => initialDate != null && endDate != null 
+            ? TimeSpan.FromMinutes((endDate.Value - initialDate.Value).TotalMinutes)
             : null;
 
 

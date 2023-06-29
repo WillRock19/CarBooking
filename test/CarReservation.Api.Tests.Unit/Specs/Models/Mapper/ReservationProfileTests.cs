@@ -52,7 +52,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
             var result = mapper.Map<Reservation>(reservationRequest);
 
             result.InitialDate.Should().Be(initialDate);
-            result.DurationInMinutes.Should().Be(expectedDuration);
+            result.DurationInMinutes.Should().Be(TimeSpan.FromMinutes(expectedDuration));
         }
 
         [Test]

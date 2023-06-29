@@ -12,7 +12,7 @@ namespace CarReservation.Api.Models.Validations
                 .WithMessage("The initial date value must be informed.");
 
             RuleFor(x => x.DurationInMinutes)
-                .GreaterThan(0);
+                .GreaterThan(TimeSpan.FromMinutes(0));
 
             RuleFor(x => x.HasDurationOfTwoHoursTops())
                 .Equal(true)

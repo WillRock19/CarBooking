@@ -1,11 +1,11 @@
 ﻿namespace CarReservation.Api.Models.Domain
 {
-    public record Reservation(int Id, string CarId, DateTime InitialDate, int DurationInMinutes) 
+    public record Reservation(int Id, string CarId, DateTime InitialDate, TimeSpan DurationInMinutes) 
     {
-        public DateTime EndDate = InitialDate.AddMinutes(DurationInMinutes);
+        public DateTime EndDate { get; } = InitialDate + DurationInMinutes;
 
         public bool StartsInTwentyFourHoursOrLess() => InitialDate <= DateTime.UtcNow.AddHours(24);
 
-        public bool HasDurationOfTwoHoursTops() => DurationInMinutes <= 120 && EndDate <= InitialDate.AddHours(2);
+        public bool HasDurationOfTwoHoursTops() => DurationInMinutes <= TimeSpan.FromHours(2);
     };
 }

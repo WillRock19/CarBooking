@@ -24,7 +24,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             public async Task Client_ShouldBeAbleToAddAndRetrieveSpecificRegister()
             {
                 // Arrange
-                var carRequest = new CarRequestBuilder().WithMake("First Make").Build();
+                var carRequest = new CreateCarRequestBuilder().WithMake("First Make").Build();
                 var postContent = new StringContent(JsonConvert.SerializeObject(carRequest), Encoding.UTF8, AcceptedContentType);
 
                 var result = await GlobalHttpClient.PostAsync(EndpointBaseRoute, postContent);
@@ -47,8 +47,8 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             public async Task Client_ShouldBeAbleToAddAndRetrieveMultipleRegisters()
             {
                 // Arrange
-                var carRequest1 = new CarRequestBuilder().WithMake("GettingAll Make 1").WithModel("GettingAll Model 1").Build();
-                var carRequest2 = new CarRequestBuilder().WithMake("GettingAll Make 2").WithModel("GettingAll Model 2").Build();
+                var carRequest1 = new CreateCarRequestBuilder().WithMake("GettingAll Make 1").WithModel("GettingAll Model 1").Build();
+                var carRequest2 = new CreateCarRequestBuilder().WithMake("GettingAll Make 2").WithModel("GettingAll Model 2").Build();
                 var postContent1 = new StringContent(JsonConvert.SerializeObject(carRequest1), Encoding.UTF8, AcceptedContentType);
                 var postContent2 = new StringContent(JsonConvert.SerializeObject(carRequest2), Encoding.UTF8, AcceptedContentType);
 
@@ -74,7 +74,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             public async Task Client_ShouldBeAbleToAddAndUpdateSpecificRegister()
             {
                 // Arrange
-                var carRequest = new CarRequestBuilder().WithMake("Updating First Make").WithModel("Updating First Model").Build();
+                var carRequest = new CreateCarRequestBuilder().WithMake("Updating First Make").WithModel("Updating First Model").Build();
                 var postContent = new StringContent(JsonConvert.SerializeObject(carRequest), Encoding.UTF8, AcceptedContentType);
 
                 var result = await GlobalHttpClient.PostAsync(EndpointBaseRoute, postContent);
@@ -83,7 +83,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var carAddedResponse = JsonDocument.Parse(await result.Content.ReadAsStringAsync());
                 var cardCreatedId = carAddedResponse.RootElement.GetProperty("carId").ToString();
 
-                var updatedCarRequest = new CarRequestBuilder().WithMake("Updating Second Make").WithModel("Updating Second Model").Build();
+                var updatedCarRequest = new CreateCarRequestBuilder().WithMake("Updating Second Make").WithModel("Updating Second Model").Build();
                 var putContent = new StringContent(JsonConvert.SerializeObject(updatedCarRequest), Encoding.UTF8, AcceptedContentType);
 
                 // Act
@@ -102,7 +102,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             public async Task Client_ShouldBeAbleToAddAndDeleteSpecificRegister()
             {
                 // Arrange
-                var carRequest = new CarRequestBuilder().WithMake("Delete Make").WithModel("Delete Model").Build();
+                var carRequest = new CreateCarRequestBuilder().WithMake("Delete Make").WithModel("Delete Model").Build();
                 var postContent = new StringContent(JsonConvert.SerializeObject(carRequest), Encoding.UTF8, AcceptedContentType);
 
                 var createResponse = await GlobalHttpClient.PostAsync(EndpointBaseRoute, postContent);
@@ -126,14 +126,14 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             public async Task Client_WhenTryingToReserveCarForSpecificDate_ShouldBeAbleToMakeTheReservion()
             {
                 // Assert
-                var carRequest = new CarRequestBuilder().WithMake("First Make").Build();
+                var carRequest = new CreateCarRequestBuilder().WithMake("First Make").Build();
                 var createCarPostContent = new StringContent(JsonConvert.SerializeObject(carRequest), Encoding.UTF8, AcceptedContentType);
 
                 var createCarResult = await GlobalHttpClient.PostAsync(EndpointBaseRoute, createCarPostContent);
                 createCarResult.EnsureSuccessStatusCode();
 
                 var reservationDate = DateTime.UtcNow.AddHours(5);
-                var reservationRequest = new ReservationRequestBuilder()
+                var reservationRequest = new CreateReservationRequestBuilder()
                     .WithReservationDate(reservationDate)
                     .WithDurationInMinutes(60)
                     .Build();
@@ -142,7 +142,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
 
                 // Act
                 var createReservationResult = await GlobalHttpClient.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent);
-                var resultContent = JsonConvert.DeserializeObject<ReserveCarResponse>(await createReservationResult.Content.ReadAsStringAsync());
+                var resultContent = JsonConvert.DeserializeObject<CreateReservationResponse>(await createReservationResult.Content.ReadAsStringAsync());
 
                 // Assert
                 createReservationResult.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -174,8 +174,8 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             public async Task Client_WhenTryingToMakeMultipleReservationsAndThereAreAvailableCars_ShouldBeAbleToMakeTheReservations()
             {
                 // Assert
-                var carRequest1 = new CarRequestBuilder().WithMake("Maybe car to be reserved 1").Build();
-                var carRequest2 = new CarRequestBuilder().WithMake("Maybe car to be reserved 2").Build();
+                var carRequest1 = new CreateCarRequestBuilder().WithMake("Maybe car to be reserved 1").Build();
+                var carRequest2 = new CreateCarRequestBuilder().WithMake("Maybe car to be reserved 2").Build();
 
                 var createCarPostContent1 = new StringContent(JsonConvert.SerializeObject(carRequest1), Encoding.UTF8, AcceptedContentType);
                 var createCarPostContent2 = new StringContent(JsonConvert.SerializeObject(carRequest2), Encoding.UTF8, AcceptedContentType);
@@ -189,8 +189,8 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var reservationDate1 = DateTime.UtcNow.AddHours(5);
                 var reservationDate2 = reservationDate1.AddHours(5);
 
-                var reservationRequest1 = new ReservationRequestBuilder().WithReservationDate(reservationDate1).WithDurationInMinutes(55).Build();
-                var reservationRequest2 = new ReservationRequestBuilder().WithReservationDate(reservationDate2).WithDurationInMinutes(87).Build();
+                var reservationRequest1 = new CreateReservationRequestBuilder().WithReservationDate(reservationDate1).WithDurationInMinutes(55).Build();
+                var reservationRequest2 = new CreateReservationRequestBuilder().WithReservationDate(reservationDate2).WithDurationInMinutes(87).Build();
 
                 var createReservationPostContent1 = new StringContent(JsonConvert.SerializeObject(reservationRequest1), Encoding.UTF8, AcceptedContentType);
                 var createReservationPostContent2 = new StringContent(JsonConvert.SerializeObject(reservationRequest2), Encoding.UTF8, AcceptedContentType);
@@ -199,8 +199,8 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var createReservationResult1 = await GlobalHttpClient.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent1);
                 var createReservationResult2 = await GlobalHttpClient.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent2);
 
-                var resultContent1 = JsonConvert.DeserializeObject<ReserveCarResponse>(await createReservationResult1.Content.ReadAsStringAsync());
-                var resultContent2 = JsonConvert.DeserializeObject<ReserveCarResponse>(await createReservationResult2.Content.ReadAsStringAsync());
+                var resultContent1 = JsonConvert.DeserializeObject<CreateReservationResponse>(await createReservationResult1.Content.ReadAsStringAsync());
+                var resultContent2 = JsonConvert.DeserializeObject<CreateReservationResponse>(await createReservationResult2.Content.ReadAsStringAsync());
 
                 // Assert
                 createReservationResult1.EnsureSuccessStatusCode();
@@ -218,7 +218,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             {
                 // Assert
                 var reservationDate = DateTime.UtcNow.AddHours(5);
-                var reservationRequest = new ReservationRequestBuilder()
+                var reservationRequest = new CreateReservationRequestBuilder()
                     .WithReservationDate(reservationDate)
                     .WithDurationInMinutes(60)
                     .Build();
@@ -227,7 +227,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
 
                 // Act
                 var createReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent);
-                var resultContent = JsonConvert.DeserializeObject<ReserveCarResponse>(await createReservationResult.Content.ReadAsStringAsync());
+                var resultContent = JsonConvert.DeserializeObject<CreateReservationResponse>(await createReservationResult.Content.ReadAsStringAsync());
 
                 // Assert
                 createReservationResult.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -239,19 +239,19 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             public async Task Client_WhenTryingToMakeReservationButNoCarsAreAvailable_ShouldReceiveErrorMessage()
             {
                 // Assert
-                var carRequest = new CarRequestBuilder().WithMake("First Make").Build();
+                var carRequest = new CreateCarRequestBuilder().WithMake("First Make").Build();
                 var createCarPostContent = new StringContent(JsonConvert.SerializeObject(carRequest), Encoding.UTF8, AcceptedContentType);
 
                 var createCarResult = await clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent);
                 createCarResult.EnsureSuccessStatusCode();
 
                 var reservationDate = DateTime.UtcNow.AddHours(5);
-                var firstReservationRequest = new ReservationRequestBuilder()
+                var firstReservationRequest = new CreateReservationRequestBuilder()
                     .WithReservationDate(reservationDate)
                     .WithDurationInMinutes(60)
                     .Build();
 
-                var secondReservationRequest = new ReservationRequestBuilder()
+                var secondReservationRequest = new CreateReservationRequestBuilder()
                     .WithReservationDate(reservationDate)
                     .WithDurationInMinutes(120)
                     .Build();
@@ -264,7 +264,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
 
                 // Act
                 var secondReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", secondReservationPostContent);
-                var resultContent = JsonConvert.DeserializeObject<ReserveCarResponse>(await secondReservationResult.Content.ReadAsStringAsync());
+                var resultContent = JsonConvert.DeserializeObject<CreateReservationResponse>(await secondReservationResult.Content.ReadAsStringAsync());
 
                 // Assert
                 secondReservationResult.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -276,36 +276,50 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             public async Task Client_ShouldBeAbleToRetrieveAllUpcomingReservationsWithoutInformingTheDate()
             {
                 // Assert
-                var reservationIds = await SetUpFourCarsAndReservations();
+                var dataCreated = await SetUpFourReservations();
 
                 // Act
                 var result = await clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations");
                 result.EnsureSuccessStatusCode();
 
                 // Assert
-                var allUpcomingReservations = await result.Content.ReadAsStringAsync();
+                var allUpcomingReservations = JsonConvert.DeserializeObject<IEnumerable<ReservationResponse>>(await result.Content.ReadAsStringAsync());
 
-                false.Should().BeTrue();
+                allUpcomingReservations.Should().HaveCount(dataCreated.Count());
+                allUpcomingReservations.Should().Contain(x => dataCreated.Any(created => created.reservationId!.Value == x.Id));
             }
 
             [Test]
             public async Task Client_ShouldBeAbleToRetrieveAllUpcomingReservationsUntilSpecificDate()
             {
-                false.Should().BeTrue();
+                // Assert
+                var dataCreated = await SetUpFourReservations();
+                var limitDate = DateTime.UtcNow.AddHours(10);
+                var expectedDataToRetrieve = dataCreated.Where(x => x.reservationDate <= limitDate);
+
+                // Act
+                var result = await clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations?untilDate={limitDate}");
+                result.EnsureSuccessStatusCode();
+
+                // Assert
+                var allUpcomingReservations = JsonConvert.DeserializeObject<IEnumerable<ReservationResponse>>(await result.Content.ReadAsStringAsync());
+
+                allUpcomingReservations.Should().HaveCount(expectedDataToRetrieve.Count());
+                allUpcomingReservations.Should().Contain(x => expectedDataToRetrieve.Any(data => data.reservationId!.Value == x.Id));
             }
 
-            private async Task<List<Guid?>> SetUpFourCarsAndReservations()
+            private async Task<List<(Guid? reservationId, DateTime reservationDate)>> SetUpFourReservations()
             {
-                var carRequest1 = new CarRequestBuilder().WithMake("First Car Make").WithModel("First Car Model").Build();
+                var carRequest1 = new CreateCarRequestBuilder().WithMake("First Car Make").WithModel("First Car Model").Build();
                 var createCarPostContent1 = new StringContent(JsonConvert.SerializeObject(carRequest1), Encoding.UTF8, AcceptedContentType);
 
-                var carRequest2 = new CarRequestBuilder().WithMake("Second Car Make").WithModel("Second Car Model").Build();
+                var carRequest2 = new CreateCarRequestBuilder().WithMake("Second Car Make").WithModel("Second Car Model").Build();
                 var createCarPostContent2 = new StringContent(JsonConvert.SerializeObject(carRequest2), Encoding.UTF8, AcceptedContentType);
 
-                var carRequest3 = new CarRequestBuilder().WithMake("Third Car Make").WithModel("Third Car Model").Build();
+                var carRequest3 = new CreateCarRequestBuilder().WithMake("Third Car Make").WithModel("Third Car Model").Build();
                 var createCarPostContent3 = new StringContent(JsonConvert.SerializeObject(carRequest3), Encoding.UTF8, AcceptedContentType);
 
-                var carRequest4 = new CarRequestBuilder().WithMake("Fourth Car Make").WithModel("Fourth Car Model").Build();
+                var carRequest4 = new CreateCarRequestBuilder().WithMake("Fourth Car Make").WithModel("Fourth Car Model").Build();
                 var createCarPostContent4 = new StringContent(JsonConvert.SerializeObject(carRequest4), Encoding.UTF8, AcceptedContentType);
 
                 (await clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent1)).EnsureSuccessStatusCode();
@@ -314,25 +328,25 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 (await clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent4)).EnsureSuccessStatusCode();
 
                 var reservationDate1 = DateTime.UtcNow.AddHours(5);
-                var reservationDate2 = DateTime.UtcNow.AddHours(10);
-                var reservationDate3 = DateTime.UtcNow.AddHours(22);
+                var reservationDate2 = reservationDate1.AddHours(10);
+                var reservationDate3 = reservationDate1.AddHours(22);
 
-                var firstReservationRequest = new ReservationRequestBuilder()
+                var firstReservationRequest = new CreateReservationRequestBuilder()
                     .WithReservationDate(reservationDate1)
-                    .WithDurationInMinutes(60)
+                    .WithDurationInMinutes(80)
                     .Build();
 
-                var secondReservationRequest = new ReservationRequestBuilder()
+                var secondReservationRequest = new CreateReservationRequestBuilder()
                     .WithReservationDate(reservationDate2)
-                    .WithDurationInMinutes(120)
+                    .WithDurationInMinutes(55)
                     .Build();
 
-                var thirdReservationRequest = new ReservationRequestBuilder()
+                var thirdReservationRequest = new CreateReservationRequestBuilder()
                     .WithReservationDate(reservationDate2)
-                    .WithDurationInMinutes(60)
+                    .WithDurationInMinutes(110)
                     .Build();
 
-                var fourthReservationRequest = new ReservationRequestBuilder()
+                var fourthReservationRequest = new CreateReservationRequestBuilder()
                     .WithReservationDate(reservationDate3)
                     .WithDurationInMinutes(120)
                     .Build();
@@ -343,16 +357,23 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var fourthReservationPostContent = new StringContent(JsonConvert.SerializeObject(fourthReservationRequest), Encoding.UTF8, AcceptedContentType);
 
                 var firstReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", firstReservationPostContent);
-                var secondReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", secondReservationPostContent);
-                var thirdReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", thirdReservationPostContent);
-                var fourthReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", fourthReservationPostContent);
+                firstReservationResult.EnsureSuccessStatusCode();
 
-                return new List<Guid?>
+                var secondReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", secondReservationPostContent);
+                secondReservationResult.EnsureSuccessStatusCode();
+
+                var thirdReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", thirdReservationPostContent);
+                thirdReservationResult.EnsureSuccessStatusCode();
+
+                var fourthReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", fourthReservationPostContent);
+                fourthReservationResult.EnsureSuccessStatusCode();
+
+                return new List<(Guid?, DateTime)>
                 {
-                    JsonConvert.DeserializeObject<ReserveCarResponse>(await firstReservationResult.Content.ReadAsStringAsync())?.ReservationId,
-                    JsonConvert.DeserializeObject<ReserveCarResponse>(await secondReservationResult.Content.ReadAsStringAsync())?.ReservationId,
-                    JsonConvert.DeserializeObject<ReserveCarResponse>(await thirdReservationResult.Content.ReadAsStringAsync())?.ReservationId,
-                    JsonConvert.DeserializeObject<ReserveCarResponse>(await fourthReservationResult.Content.ReadAsStringAsync())?.ReservationId,
+                    (JsonConvert.DeserializeObject<CreateReservationResponse>(await firstReservationResult.Content.ReadAsStringAsync())?.ReservationId, reservationDate1),
+                    (JsonConvert.DeserializeObject<CreateReservationResponse>(await secondReservationResult.Content.ReadAsStringAsync())?.ReservationId, reservationDate2),
+                    (JsonConvert.DeserializeObject<CreateReservationResponse>(await thirdReservationResult.Content.ReadAsStringAsync())?.ReservationId, reservationDate2),
+                    (JsonConvert.DeserializeObject<CreateReservationResponse>(await fourthReservationResult.Content.ReadAsStringAsync())?.ReservationId, reservationDate3),
                 };
             }
 

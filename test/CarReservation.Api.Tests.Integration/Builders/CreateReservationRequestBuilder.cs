@@ -2,7 +2,7 @@
 
 namespace CarReservation.Api.Tests.Integration.Builders
 {
-    internal class ReservationRequestBuilder
+    internal class CreateReservationRequestBuilder
     {
         private bool emptyReservationDate;
         private bool emptyDurationDate;
@@ -10,32 +10,32 @@ namespace CarReservation.Api.Tests.Integration.Builders
         private DateTime? reservationDate;
         private int? durationInMinutes;
 
-        internal ReservationRequestBuilder WithEmptyReservationDate() 
+        internal CreateReservationRequestBuilder WithEmptyReservationDate() 
         {
             emptyReservationDate = true;
             return this;
         }
 
-        internal ReservationRequestBuilder WithEmptyDurationInMinutes()
+        internal CreateReservationRequestBuilder WithEmptyDurationInMinutes()
         {
             emptyDurationDate = true;
             return this;
         }
 
-        internal ReservationRequestBuilder WithReservationDate(DateTime reservationDate)
+        internal CreateReservationRequestBuilder WithReservationDate(DateTime reservationDate)
         {
             this.reservationDate = reservationDate;
             return this;
         }
 
-        internal ReservationRequestBuilder WithDurationInMinutes(int durationInMinutes)
+        internal CreateReservationRequestBuilder WithDurationInMinutes(int durationInMinutes)
         {
             this.durationInMinutes = durationInMinutes;
             return this;
         }
 
 
-        internal ReservationRequest Build() => new()
+        internal CreateReservationRequest Build() => new()
         {
             ReservationDate = emptyReservationDate
             ? default

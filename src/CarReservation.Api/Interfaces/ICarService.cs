@@ -9,12 +9,14 @@ namespace CarReservation.Api.Interfaces
 
         CarResponse? GetCar(string carId);
 
-        string AddCar(CarRequest carRequest);
+        string AddCar(CreateCarRequest carRequest);
 
-        CarResponse UpdateCar(string carId, CarRequest carRequest);
+        CarResponse UpdateCar(string carId, CreateCarRequest carRequest);
 
         void DeleteCar(string carId);
 
-        Task<ReserveCarResponse> ReserveCarAsync(ReservationRequest reservationRequest);
+        Task<CreateReservationResponse> ReserveCarAsync(CreateReservationRequest reservationRequest);
+
+        IEnumerable<ReservationResponse> AllCarReservationsUntil(DateTime? limitDate);
     }
 }

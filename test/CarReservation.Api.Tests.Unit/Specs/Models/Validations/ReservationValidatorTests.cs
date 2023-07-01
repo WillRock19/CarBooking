@@ -1,5 +1,5 @@
 ﻿using CarReservation.Api.Models.Validations;
-using CarReservation.Api.Tests.Unit.Builders;
+using CarReservation.Api.Tests.Unit.Builders.Models;
 using FluentAssertions;
 using NUnit.Framework;
 

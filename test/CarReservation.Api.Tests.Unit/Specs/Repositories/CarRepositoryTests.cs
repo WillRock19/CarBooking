@@ -1,6 +1,6 @@
 ﻿using CarReservation.Api.Models.Domain;
 using CarReservation.Api.Repositories;
-using CarReservation.Api.Tests.Unit.Builders;
+using CarReservation.Api.Tests.Unit.Builders.Models;
 using FluentAssertions;
 using NUnit.Framework;
 

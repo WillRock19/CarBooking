@@ -1,6 +1,7 @@
 ﻿using CarReservation.Api.Models.DTO.Request;
 using CarReservation.Api.Models.Validations;
 using CarReservation.Api.Tests.Unit.Builders;
+using CarReservation.Api.Tests.Unit.Builders.DTO;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -18,7 +19,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Validations
         [Test]
         public void Validator_WhenReservationRequestIsValid_ShouldNotReturnErrorMessage()
         {
-            var reservationRequest = new ReservationRequestBuilder().Build();
+            var reservationRequest = new CreateReservationRequestBuilder().Build();
 
             var result = _reservationRequestValidator.Validate(reservationRequest);
 
@@ -29,8 +30,8 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Validations
         [Test]
         public void Validator_WhenReservationDateIsEmpty_ReturnsErrorMessage()
         {
-            var propertyName = nameof(ReservationRequest.ReservationDate);
-            var reservationRequest = new ReservationRequestBuilder().WithEmptyReservationDate().Build();
+            var propertyName = nameof(CreateReservationRequest.ReservationDate);
+            var reservationRequest = new CreateReservationRequestBuilder().WithEmptyReservationDate().Build();
 
             var result = _reservationRequestValidator.Validate(reservationRequest);
 
@@ -42,8 +43,8 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Validations
         [Test]
         public void Validator_WhenDurationInMinutesIsEmpty_ReturnsErrorMessage()
         {
-            var propertyName = nameof(ReservationRequest.DurationInMinutes);
-            var reservationRequest = new ReservationRequestBuilder().WithEmptyDurationInMinutes().Build();
+            var propertyName = nameof(CreateReservationRequest.DurationInMinutes);
+            var reservationRequest = new CreateReservationRequestBuilder().WithEmptyDurationInMinutes().Build();
 
             var result = _reservationRequestValidator.Validate(reservationRequest);
 

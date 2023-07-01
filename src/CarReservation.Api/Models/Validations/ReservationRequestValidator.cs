@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace CarReservation.Api.Models.Validations
 {
-    public class ReservationRequestValidator : AbstractValidator<ReservationRequest>
+    public class ReservationRequestValidator : AbstractValidator<CreateReservationRequest>
     {
         public ReservationRequestValidator()
         {

@@ -3,7 +3,8 @@ using CarReservation.Api.Models.Domain;
 using CarReservation.Api.Models.DTO.Request;
 using CarReservation.Api.Models.DTO.Response;
 using CarReservation.Api.Models.Mapper;
-using CarReservation.Api.Tests.Unit.Builders;
+using CarReservation.Api.Tests.Unit.Builders.DTO;
+using CarReservation.Api.Tests.Unit.Builders.Models;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -34,7 +35,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
         [Test]
         public void Profile_WhenCarRequestPropertiesHaveValue_MapToCarCorrectly()
         {
-            var carRequest = new CarRequestBuilder().Build();
+            var carRequest = new CreateCarRequestBuilder().Build();
 
             var result = mapper.Map<Car>(carRequest);
 
@@ -48,7 +49,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
         [TestCase("", "")]
         public void Profile_WhenCarRequestPropertiesAreEmptyOrNull_MapToCarCorrectly(string make, string model)
         {
-            var carRequest = new CarRequest() { Make = make, Model = model };
+            var carRequest = new CreateCarRequest() { Make = make, Model = model };
 
             var result = mapper.Map<Car>(carRequest);
 

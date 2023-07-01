@@ -1,6 +1,6 @@
 ﻿using CarReservation.Api.Models.Domain;
 using CarReservation.Api.Repositories;
-using CarReservation.Api.Tests.Unit.Builders;
+using CarReservation.Api.Tests.Unit.Builders.Models;
 using FluentAssertions;
 using NUnit.Framework;
 
@@ -43,6 +43,39 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
 
                 repository.GetById(reservationId1).Should().BeEquivalentTo(reservation1 with { Id = reservationId1 });
                 repository.GetById(reservationId2).Should().BeEquivalentTo(reservation2 with { Id = reservationId2 });
+            }
+        }
+
+        internal class GetAll : ReservationRepositoryTests 
+        {
+            [Test]
+            public void WhenDatabaseIsEmpty_ReturnsEmptyList()
+            {
+                var repository = new ReservationRepository();
+
+                repository.GetAll().Should().BeEmpty();
+            }
+
+            [Test]
+            public void WhenDatabaseHasReservations_ReturnsAllReservations()
+            {
+                var repository = new ReservationRepository();
+
+                var firstReservation = new ReservationBuilder().Build();
+                var firstReservationId = repository.Add(firstReservation);
+
+                var secondReservation = new ReservationBuilder().Build();
+                var secondReservationId = repository.Add(secondReservation);
+
+                var thirdReservation = new ReservationBuilder().Build();
+                var thirdReservationId = repository.Add(thirdReservation);
+
+                repository.GetAll().Should().BeEquivalentTo(new List<Reservation>
+                {
+                    firstReservation with { Id = firstReservationId },
+                    secondReservation with { Id = secondReservationId },
+                    thirdReservation with { Id = thirdReservationId },
+                });
             }
         }
 

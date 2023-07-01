@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using CarReservation.Api.Interfaces;
 using CarReservation.Api.Models.Domain;
+using CarReservation.Api.Models.Mapper;
 using CarReservation.Api.Services;
-using CarReservation.Api.Tests.Unit.Builders;
+using CarReservation.Api.Tests.Unit.Builders.DTO;
+using CarReservation.Api.Tests.Unit.Builders.Models;
 using FluentAssertions;
 using FluentValidation;
 using FluentValidation.Results;
@@ -43,7 +45,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 const string secondErrorMessage = "Second error that occured";
                 var expectedErrorMessage = $"The reservation cannot be made. The following errors occured: \r\n* {firstErrorMessage}\r\n* {secondErrorMessage}\r\n";
                 
-                var fakeReservationRequest = new ReservationRequestBuilder().Build();
+                var fakeReservationRequest = new CreateReservationRequestBuilder().Build();
                 var fakeInvalidReservation = new ReservationBuilder().Build();
 
                 var validationFailures = new List<ValidationFailure> 
@@ -74,7 +76,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 const string carId = "C1";
                 const string expectedErrorMessage = "There's no car available for the desired date and time.";
 
-                var fakeReservationRequest = new ReservationRequestBuilder().Build();
+                var fakeReservationRequest = new CreateReservationRequestBuilder().Build();
                 var fakeInvalidReservation = new ReservationBuilder().Build();
                 var reservationRequestValidationResult = new ValidationResult();
                 var existingCarFromDatabase = new CarBuilder().WithId(carId).Build();
@@ -110,7 +112,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var reservationInitialDate = DateTime.UtcNow;
                 var expectedSuccessMessage = $"Reservation successfully created for date {reservationInitialDate}. Your reservation ID is: {reservationId}.";
 
-                var fakeReservationRequest = new ReservationRequestBuilder().Build();
+                var fakeReservationRequest = new CreateReservationRequestBuilder().Build();
                 var fakeReservation = new ReservationBuilder().WithCarId(AvailableCarId).Build();
                 var reservationRequestValidationResult = new ValidationResult();
 
@@ -138,6 +140,66 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 // Assert
                 result.ReservationId.Should().Be(reservationId);
                 result.Message.Should().Be(expectedSuccessMessage);
+            }
+        }
+
+        internal class AllCarReservationsUntil : CarServiceTests 
+        {
+            private CarService service;
+            private IMapper realMapper;
+            private IEnumerable<Reservation> reservationsInDatabase;
+
+            [SetUp]
+            public void SetUp()
+            {
+                reservationsInDatabase = new List<Reservation>()
+                {
+                    new ReservationBuilder().WithCarId("C1").WithInitialDate(DateTime.UtcNow.AddHours(1)).Build(),
+                    new ReservationBuilder().WithCarId("C2").WithInitialDate(DateTime.UtcNow.AddHours(2)).Build(),
+                    new ReservationBuilder().WithCarId("C3").WithInitialDate(DateTime.UtcNow.AddHours(3)).Build(),
+                    new ReservationBuilder().WithCarId("C4").WithInitialDate(DateTime.UtcNow.AddHours(8)).Build(),
+                    new ReservationBuilder().WithCarId("C5").WithInitialDate(DateTime.UtcNow.AddHours(10)).Build(),
+                    new ReservationBuilder().WithCarId("C6").WithInitialDate(DateTime.UtcNow.AddHours(15)).Build(),
+                };
+                reservationRepositoryMock.Setup(x => x.GetAll()).Returns(reservationsInDatabase);
+
+                realMapper = new MapperConfiguration(cfg => cfg.AddProfile<ReservationProfile>()).CreateMapper();
+                service = new CarService(carRepositoryMock.Object, realMapper, reservationRepositoryMock.Object, reservationValidatorMock.Object);
+            }
+
+            [Test]
+            public void WhenLimitDateIsNull_ReturnsAllRegistersFromDatabase()
+            {
+                var limitDate = (DateTime?)null;
+
+                var result = service.AllCarReservationsUntil(limitDate);
+
+                result.Should().HaveCount(reservationsInDatabase.Count())
+                    .And
+                    .Contain(x => reservationsInDatabase.Any(
+                        reservation => reservation.Id == x.Id &&
+                        reservation.CarId == x.CarId &&
+                        reservation.InitialDate == x.InitialDate &&
+                        reservation.DurationInMinutes.TotalMinutes == x.DurationInMinutes)
+                    );
+            }
+
+            [Test]
+            public void WhenLimitDateHasValue_ReturnsAllRegistersWhoseInitialDateAreLessOrEqualToLimitDate()
+            {
+                var limitDate = DateTime.UtcNow.AddHours(9);
+                var expectedResult = reservationsInDatabase.Where(x => x.CarId != "C5" && x.CarId != "C6");
+
+                var result = service.AllCarReservationsUntil(limitDate);
+
+                result.Should().HaveCount(4)
+                    .And
+                    .Contain(x => expectedResult.Any(
+                        reservation => reservation.Id == x.Id &&
+                        reservation.CarId == x.CarId &&
+                        reservation.InitialDate == x.InitialDate &&
+                        reservation.DurationInMinutes.TotalMinutes == x.DurationInMinutes)
+                    );
             }
         }
     }

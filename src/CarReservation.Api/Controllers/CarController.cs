@@ -11,11 +11,11 @@ namespace CarReservation.Api.Controllers
     [Route("api/v1/[controller]")]
     public class CarController : ControllerBase
     {
-        private readonly IValidator<CarRequest> carRequestvalidator;
-        private readonly IValidator<ReservationRequest> reservationRequestValidator;
+        private readonly IValidator<CreateCarRequest> carRequestvalidator;
+        private readonly IValidator<CreateReservationRequest> reservationRequestValidator;
         private readonly ICarService carService;
 
-        public CarController(ICarService carService, IValidator<CarRequest> carRequestvalidator, IValidator<ReservationRequest> reservationRequestValidator)
+        public CarController(ICarService carService, IValidator<CreateCarRequest> carRequestvalidator, IValidator<CreateReservationRequest> reservationRequestValidator)
         {
             this.carService = carService;
             this.carRequestvalidator = carRequestvalidator;
@@ -45,15 +45,15 @@ namespace CarReservation.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> CreateCar([FromBody] CarRequest carRequest)
+        public async Task<IActionResult> CreateCar([FromBody] CreateCarRequest carRequest)
         {
             if (carRequest == null)
-                return UnprocessableEntity("Request content cannot be null.");
+                return BadRequest("Request content cannot be null.");
 
             var validationResult = await carRequestvalidator.ValidateAsync(carRequest);
 
             if(!validationResult.IsValid)
-                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+                return UnprocessableEntity(validationResult.Errors.Select(x => x.ErrorMessage));
 
             var carId = carService.AddCar(carRequest);
             return Created($"api/v1/{carId}", new { carId });
@@ -64,18 +64,18 @@ namespace CarReservation.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Accepted)]
         [ProducesResponseType((int)HttpStatusCode.UnprocessableEntity)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> UpdateCar(string car_id, [FromBody] CarRequest carRequest)
+        public async Task<IActionResult> UpdateCar(string car_id, [FromBody] CreateCarRequest carRequest)
         {
             if (string.IsNullOrEmpty(car_id))
                 return BadRequest($"Query parameter {nameof(car_id)} cannot be null or empty.");
 
             if (carRequest == null)
-                return UnprocessableEntity("Request content cannot be null.");
+                return BadRequest("Request content cannot be null.");
 
             var validationResult = await carRequestvalidator.ValidateAsync(carRequest);
 
             if (!validationResult.IsValid)
-                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+                return UnprocessableEntity(validationResult.Errors.Select(x => x.ErrorMessage));
 
             try
             {
@@ -109,13 +109,21 @@ namespace CarReservation.Api.Controllers
         }
 
         [HttpGet("reservations")]
-        public IActionResult GetUpcomingReservations([FromQuery] DateTime untilDate) 
+        public IActionResult GetUpcomingReservations([FromQuery] DateTime? untilDate) 
         {
-            return Ok();
+            try
+            {
+                var allReservationsResponse = carService.AllCarReservationsUntil(untilDate);
+                return Ok(allReservationsResponse);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
 
         [HttpPost("reservations")]
-        public async Task<IActionResult> CreateReservation([FromBody] ReservationRequest reservationRequest)
+        public async Task<IActionResult> CreateReservation([FromBody] CreateReservationRequest reservationRequest)
         {
             if (reservationRequest == null)
                 return BadRequest("Request content cannot be null.");
@@ -124,10 +132,17 @@ namespace CarReservation.Api.Controllers
                 .ValidateAsync(reservationRequest);
 
             if (!validationResult.IsValid)
-                return BadRequest(validationResult.Errors.Select(x => x.ErrorMessage));
+                return UnprocessableEntity(validationResult.Errors.Select(x => x.ErrorMessage));
 
-            var response = await carService.ReserveCarAsync(reservationRequest);
-            return response.ReservationId.HasValue ? Ok(response) : BadRequest(response);
+            try
+            {
+                var response = await carService.ReserveCarAsync(reservationRequest);
+                return response.ReservationId.HasValue ? Ok(response) : BadRequest(response);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

@@ -9,7 +9,7 @@ namespace CarReservation.Api.Models.Mapper
     {
         public CarProfile()
         {
-            CreateMap<CarRequest, Car>()
+            CreateMap<CreateCarRequest, Car>()
                 .ForMember(dest => dest.Id, src => src.Ignore())
                 .ForMember(dest => dest.Make, src => src.MapFrom(request => request.Make ?? string.Empty))
                 .ForMember(dest => dest.Model, src => src.MapFrom(request => request.Model ?? string.Empty))

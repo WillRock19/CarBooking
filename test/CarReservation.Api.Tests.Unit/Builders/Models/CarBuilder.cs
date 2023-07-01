@@ -1,6 +1,6 @@
 ﻿using CarReservation.Api.Models.Domain;
 
-namespace CarReservation.Api.Tests.Unit.Builders
+namespace CarReservation.Api.Tests.Unit.Builders.Models
 {
     internal class CarBuilder
     {
@@ -14,7 +14,7 @@ namespace CarReservation.Api.Tests.Unit.Builders
             return this;
         }
 
-        internal CarBuilder WithModel(string model) 
+        internal CarBuilder WithModel(string model)
         {
             this.model = model;
             return this;

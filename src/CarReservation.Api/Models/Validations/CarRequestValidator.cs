@@ -3,23 +3,23 @@ using FluentValidation;
 
 namespace CarReservation.Api.Models.Validations
 {
-    public class CarRequestValidator : AbstractValidator<CarRequest>
+    public class CarRequestValidator : AbstractValidator<CreateCarRequest>
     {
         public CarRequestValidator()
         {
             RuleFor(carRequest => carRequest.Make)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage($"{nameof(CarRequest.Make)} should not be null, empty.")
+                .WithMessage($"{nameof(CreateCarRequest.Make)} should not be null, empty.")
                 .MinimumLength(2)
-                .WithMessage($"{nameof(CarRequest.Make)} should have more than 2 characters.");
+                .WithMessage($"{nameof(CreateCarRequest.Make)} should have more than 2 characters.");
 
             RuleFor(carRequest => carRequest.Model)
                 .Cascade(CascadeMode.Stop)
                 .NotEmpty()
-                .WithMessage($"{nameof(CarRequest.Model)} should not be null, empty.")
+                .WithMessage($"{nameof(CreateCarRequest.Model)} should not be null, empty.")
                 .MinimumLength(2)
-                .WithMessage($"{nameof(CarRequest.Model)} should have more than 2 characters.");
+                .WithMessage($"{nameof(CreateCarRequest.Model)} should have more than 2 characters.");
         }
     }
 }

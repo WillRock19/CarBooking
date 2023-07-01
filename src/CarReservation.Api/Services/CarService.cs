@@ -39,13 +39,13 @@ namespace CarReservation.Api.Services
             return mapper.Map<CarResponse>(car);
         }
 
-        public string AddCar(CarRequest carRequest)
+        public string AddCar(CreateCarRequest carRequest)
         {
             var carEntity = mapper.Map<Car>(carRequest);
             return carRepository.Add(carEntity);
         }
 
-        public CarResponse UpdateCar(string carId, CarRequest carRequest)
+        public CarResponse UpdateCar(string carId, CreateCarRequest carRequest)
         {
             var _ = carRepository.GetById(carId) ?? throw new KeyNotFoundException($"Operation cannot be completed. There's no car with {carId}");
             var carUpdated = carRepository.Update(mapper.Map<Car>(carRequest) with 
@@ -58,7 +58,7 @@ namespace CarReservation.Api.Services
 
         public void DeleteCar(string carId) => carRepository.Delete(carId);
 
-        public async Task<ReserveCarResponse> ReserveCarAsync(ReservationRequest reservationRequest)
+        public async Task<CreateReservationResponse> ReserveCarAsync(CreateReservationRequest reservationRequest)
         {
             var reservation = mapper.Map<Reservation>(reservationRequest);
 
@@ -66,7 +66,7 @@ namespace CarReservation.Api.Services
                 .ValidateAsync(reservation);
             
             if(!validationResult.IsValid)
-                return new ReserveCarResponse(null, BuildReservationValidErrorMessage(validationResult.Errors));
+                return new CreateReservationResponse(null, BuildReservationValidErrorMessage(validationResult.Errors));
 
             var carsReservedInIntervalSet = new HashSet<string>(reservationRepository
                 .FindCarsReservedInInterval(reservation.InitialDate, reservation.EndDate));
@@ -77,13 +77,29 @@ namespace CarReservation.Api.Services
                 .ToList();
 
             if (!carsAvailableForReservation.Any()) 
-                return new ReserveCarResponse(null, "There's no car available for the desired date and time.");
+                return new CreateReservationResponse(null, "There's no car available for the desired date and time.");
 
             var carToReserve = carsAvailableForReservation.First();
             var reservationId = reservationRepository.Add(reservation with { CarId = carToReserve.Id });
             var successMessage = $"Reservation successfully created for date {reservation.InitialDate}. Your reservation ID is: {reservationId}.";
 
-            return new ReserveCarResponse(reservationId, successMessage);
+            var result = new CreateReservationResponse(reservationId, successMessage);
+            return result;
+        }
+
+        public IEnumerable<ReservationResponse> AllCarReservationsUntil(DateTime? limitDate) 
+        {
+            var cars = carRepository .GetAll().ToList();
+            var a = reservationRepository.GetAll().ToList();
+            var b = reservationRepository.GetAll().Where(x => x.InitialDate <= limitDate!.Value).ToList();
+
+
+
+            var reservations = limitDate.HasValue 
+                ? reservationRepository.GetAll().Where(x => x.InitialDate <= limitDate.Value) 
+                : reservationRepository.GetAll();
+
+            return mapper.Map<IEnumerable<ReservationResponse>>(reservations);
         }
 
         private string BuildReservationValidErrorMessage(List<ValidationFailure> validationFailures) 

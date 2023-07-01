@@ -8,6 +8,8 @@ namespace CarReservation.Api.Interfaces
 
         Reservation? GetById(Guid id);
 
+        IEnumerable<Reservation> GetAll();
+
         IEnumerable<string> FindCarsReservedInInterval(DateTime reservationBeginning, DateTime reservationEnding);
     }
 }

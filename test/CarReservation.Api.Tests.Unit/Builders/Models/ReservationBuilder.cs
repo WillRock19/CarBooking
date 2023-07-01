@@ -1,6 +1,6 @@
 ﻿using CarReservation.Api.Models.Domain;
 
-namespace CarReservation.Api.Tests.Unit.Builders
+namespace CarReservation.Api.Tests.Unit.Builders.Models
 {
     internal class ReservationBuilder
     {
@@ -16,13 +16,19 @@ namespace CarReservation.Api.Tests.Unit.Builders
             reservationId = Guid.Empty;
         }
 
+        internal ReservationBuilder WithId(Guid reservationId)
+        {
+            this.reservationId = reservationId;
+            return this;
+        }
+
         internal ReservationBuilder WithCarId(string carId)
         {
             this.carId = carId;
             return this;
         }
 
-        internal ReservationBuilder WithInitialDate(DateTime initialDate) 
+        internal ReservationBuilder WithInitialDate(DateTime initialDate)
         {
             this.initialDate = initialDate;
             return this;
@@ -40,7 +46,7 @@ namespace CarReservation.Api.Tests.Unit.Builders
             return this;
         }
 
-        internal Reservation Build() 
+        internal Reservation Build()
         {
             var durationOfReservation = durationInMinutes ?? RandomMinutesUpToTwoHours();
             var defaultInitialDate = emptyInitialDate ? default : DateTime.UtcNow;
@@ -51,11 +57,11 @@ namespace CarReservation.Api.Tests.Unit.Builders
                 initialDate ?? defaultInitialDate,
                 DurationOfCustomizedInterval() ?? durationOfReservation
             );
-        } 
+        }
 
         private TimeSpan RandomMinutesUpToTwoHours() => TimeSpan.FromMinutes(new Random().Next(1, 120));
 
-        private TimeSpan? DurationOfCustomizedInterval() => initialDate != null && endDate != null 
+        private TimeSpan? DurationOfCustomizedInterval() => initialDate != null && endDate != null
             ? TimeSpan.FromMinutes((endDate.Value - initialDate.Value).TotalMinutes)
             : null;
 

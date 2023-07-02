@@ -1,7 +1,9 @@
-﻿using CarReservation.Api.Models.Domain;
+﻿using CarReservation.Api.Interfaces;
+using CarReservation.Api.Models.Domain;
 using CarReservation.Api.Repositories;
 using CarReservation.Api.Tests.Unit.Builders.Models;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 
 namespace CarReservation.Api.Tests.Unit.Specs.Repositories
@@ -43,39 +45,6 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
 
                 repository.GetById(reservationId1).Should().BeEquivalentTo(reservation1 with { Id = reservationId1 });
                 repository.GetById(reservationId2).Should().BeEquivalentTo(reservation2 with { Id = reservationId2 });
-            }
-        }
-
-        internal class GetAll : ReservationRepositoryTests 
-        {
-            [Test]
-            public void WhenDatabaseIsEmpty_ReturnsEmptyList()
-            {
-                var repository = new ReservationRepository();
-
-                repository.GetAll().Should().BeEmpty();
-            }
-
-            [Test]
-            public void WhenDatabaseHasReservations_ReturnsAllReservations()
-            {
-                var repository = new ReservationRepository();
-
-                var firstReservation = new ReservationBuilder().Build();
-                var firstReservationId = repository.Add(firstReservation);
-
-                var secondReservation = new ReservationBuilder().Build();
-                var secondReservationId = repository.Add(secondReservation);
-
-                var thirdReservation = new ReservationBuilder().Build();
-                var thirdReservationId = repository.Add(thirdReservation);
-
-                repository.GetAll().Should().BeEquivalentTo(new List<Reservation>
-                {
-                    firstReservation with { Id = firstReservationId },
-                    secondReservation with { Id = secondReservationId },
-                    thirdReservation with { Id = thirdReservationId },
-                });
             }
         }
 
@@ -312,6 +281,101 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
                     .Contain(x => x == reservationStartsPriorEndsAfter1.CarId)
                     .And
                     .Contain(x => x == reservationStartsPriorEndsAfter1.CarId);
+            }
+        }
+
+        internal class GetUpcomingReservations : ReservationRepositoryTests 
+        {
+            private DateTime _currentDateUtc;
+            private Mock<ICurrentDate> _currentDateMock;
+            private ReservationRepository _repository;
+
+            [SetUp]
+            public void SetUp() 
+            {
+                _currentDateUtc = DateTime.UtcNow;
+                _currentDateMock = new Mock<ICurrentDate>();
+
+                _currentDateMock.Setup(x => x.DateUtcNow())
+                    .Returns(_currentDateUtc);
+
+                _repository = new ReservationRepository();
+            }
+
+            [Test]
+            public void WhenDatabaseHasOnlyReservationsThatAlreadyStarted_ReturnsEmpty() 
+            {
+                var reservation1 = new ReservationBuilder().WithInitialDate(_currentDateUtc).WithDurationInMinutes(50).Build();
+                var reservation2 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMilliseconds(-1)).WithDurationInMinutes(50).Build();
+                var reservation3 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(-50)).WithDurationInMinutes(50).Build();
+                var reservation4 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(-100)).WithDurationInMinutes(50).Build();
+
+                _repository.Add(reservation1);
+                _repository.Add(reservation2);
+                _repository.Add(reservation3);
+                _repository.Add(reservation4);
+
+                _repository.GetAllUpcomingReservations(_currentDateMock.Object).Should().BeEmpty();
+            }
+
+            [Test]
+            public void WhenDatabaseHasOnlyReservationsThatAreStillToStart_ReturnAllReservations() 
+            {
+                var reservation1 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMilliseconds(1)).WithDurationInMinutes(50).Build();
+                var reservation2 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(60)).WithDurationInMinutes(78).Build();
+                var reservation3 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(120)).WithDurationInMinutes(99).Build();
+                var reservation4 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(500)).WithDurationInMinutes(46).Build();
+
+                var idReservation1 = _repository.Add(reservation1);
+                var idReservation2 = _repository.Add(reservation2);
+                var idReservation3 = _repository.Add(reservation3);
+                var idReservation4 = _repository.Add(reservation4);
+
+                var expectedResult = new List<Reservation>()
+                {
+                    reservation1 with { Id = idReservation1 },
+                    reservation2 with { Id = idReservation2 },
+                    reservation3 with { Id = idReservation3 },
+                    reservation4 with { Id = idReservation4 }
+                };
+
+                _repository.GetAllUpcomingReservations(_currentDateMock.Object).Should().BeEquivalentTo(expectedResult);
+            }
+
+            [Test]
+            public void WhenDatabaseHasAMixedOfAlreadyStartedAndStillToStartReservations_ReturnTheReservationsThatNotStartedYet()
+            {
+                var reservation1 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMilliseconds(1)).WithDurationInMinutes(50).Build();
+                var reservation2 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(60)).WithDurationInMinutes(60).Build();
+                var reservation3 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(120)).WithDurationInMinutes(90).Build();
+                var reservation4 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(500)).WithDurationInMinutes(45).Build();
+
+                var reservation5 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMilliseconds(-1)).WithDurationInMinutes(66).Build();
+                var reservation6 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(-60)).WithDurationInMinutes(34).Build();
+                var reservation7 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(-120)).WithDurationInMinutes(89).Build();
+                var reservation8 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(-500)).WithDurationInMinutes(50).Build();
+
+                _repository.Add(reservation5);
+                _repository.Add(reservation6);
+
+                var idReservation1 = _repository.Add(reservation1);
+                var idReservation2 = _repository.Add(reservation2);
+
+                _repository.Add(reservation7);
+                _repository.Add(reservation8);
+
+                var idReservation3 = _repository.Add(reservation3);
+                var idReservation4 = _repository.Add(reservation4);
+
+                var expectedResult = new List<Reservation>()
+                {
+                    reservation1 with { Id = idReservation1 },
+                    reservation2 with { Id = idReservation2 },
+                    reservation3 with { Id = idReservation3 },
+                    reservation4 with { Id = idReservation4 }
+                };
+
+                _repository.GetAllUpcomingReservations(_currentDateMock.Object).Should().BeEquivalentTo(expectedResult);
             }
         }
     }

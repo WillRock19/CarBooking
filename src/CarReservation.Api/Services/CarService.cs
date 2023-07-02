@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CarReservation.Api.Interfaces;
 using CarReservation.Api.Interfaces.Infraestructure;
 using CarReservation.Api.Interfaces.Repositories;
 using CarReservation.Api.Models.Domain;
@@ -16,10 +17,17 @@ namespace CarReservation.Api.Services
         private readonly IMapper mapper;
         private readonly IReservationRepository reservationRepository;
         private readonly IValidator<Reservation> reservationValidator;
+        private readonly ICurrentDate currentDate;
 
-        public CarService(ICarRepository carRepository, IMapper mapper, IReservationRepository reservationRepository, IValidator<Reservation> reservationValidator)
+        public CarService(
+            ICarRepository carRepository, 
+            ICurrentDate currentDate,
+            IMapper mapper, 
+            IReservationRepository reservationRepository, 
+            IValidator<Reservation> reservationValidator)
         {
             this.carRepository = carRepository;
+            this.currentDate = currentDate;
             this.mapper = mapper;
             this.reservationRepository = reservationRepository;
             this.reservationValidator = reservationValidator;
@@ -92,11 +100,11 @@ namespace CarReservation.Api.Services
             return new CreateReservationResponse(reservationId, carToReserve.Id, successMessage);
         }
 
-        public IEnumerable<ReservationResponse> AllCarReservationsUntil(DateTime? limitDate) 
+        public IEnumerable<ReservationResponse> GetAllUpcomingReservationsUntil(DateTime? limitDate) 
         {
             var reservations = limitDate.HasValue 
-                ? reservationRepository.GetAll().Where(x => x.InitialDate <= limitDate.Value) 
-                : reservationRepository.GetAll();
+                ? reservationRepository.GetAllUpcomingReservations(currentDate).Where(x => x.InitialDate <= limitDate.Value) 
+                : reservationRepository.GetAllUpcomingReservations(currentDate);
 
             return mapper.Map<IEnumerable<ReservationResponse>>(reservations);
         }

@@ -7,13 +7,23 @@ using CarReservation.Api.Models.Validations;
 using CarReservation.Api.Repositories;
 using CarReservation.Api.Services;
 using FluentValidation;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => 
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Car Booking App", Version = "v1" });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+    options.IncludeXmlComments(xmlPath);
+});
 
 builder.Services.AddValidatorsFromAssemblyContaining<CarRequestValidator>();
 builder.Services.AddSingleton<ICurrentDate, CurrentDate>();
@@ -29,11 +39,12 @@ builder.Services.AddAutoMapper(config =>
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(options => 
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Car Booking App V1");
+    options.RoutePrefix = string.Empty;
+});
 
 app.UseHttpsRedirection();
 

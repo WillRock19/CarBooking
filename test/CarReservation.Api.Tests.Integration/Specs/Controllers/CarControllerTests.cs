@@ -277,7 +277,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             {
                 // Assert
                 var currentDate = DateTime.UtcNow;
-                var dataCreated = await SetUpFourCarsAndFourReservationsForTheSameDate(currentDate);
+                var dataCreated = await SetUpFourCarsAndFourReservationsForTheSameDate(currentDate.AddMinutes(1));
 
                 // Act
                 var result = await _clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations");
@@ -298,6 +298,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             {
                 // Assert
                 var currentDate = DateTime.UtcNow;
+                var dateReservation0 = currentDate.AddMinutes(-30);
                 var dateReservation1 = currentDate.AddMinutes(10);
                 var dateReservation2 = currentDate.AddMinutes(30);
                 var dateReservation3 = currentDate.AddMinutes(50);
@@ -315,6 +316,9 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 };
 
                 await SetUpFourCarsToBeUsed();
+
+                var reservationResult0 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation0, 30));
+                reservationResult0.EnsureSuccessStatusCode();
 
                 var reservationResult1 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation1, 80));
                 reservationResult1.EnsureSuccessStatusCode();
@@ -335,7 +339,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 reservationResult6.EnsureSuccessStatusCode();
 
                 // Act
-                var result = await _clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations?untilDate={dateLimitToSearch}");
+                var result = await _clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations?limitDate={dateLimitToSearch}");
                 result.EnsureSuccessStatusCode();
 
                 // Assert

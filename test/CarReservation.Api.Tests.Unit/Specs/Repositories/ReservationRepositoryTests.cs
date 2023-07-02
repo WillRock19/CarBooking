@@ -79,119 +79,239 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             }
         }
 
-        internal class FindCarsReservedInInterval : ReservationRepositoryTests 
+        internal class FindCarsReservedDuringDate : ReservationRepositoryTests 
         {
-            private readonly DateTime intervalBeginning;
-            private readonly DateTime intervalEnding;
-
-            public FindCarsReservedInInterval()
-            {
-                intervalBeginning = DateTime.Now.AddHours(2);
-                intervalEnding = intervalBeginning.AddHours(2);
-            }
+            private readonly DateTime currentDateToUse = DateTime.UtcNow;
 
             [Test]
             public void WhenDatabaseIsEmpty_ReturnsEmptyList()
             {
                 var repository = new ReservationRepository();
 
-                var carIds = repository.FindCarsReservedInInterval(intervalBeginning, intervalEnding);
-                
+                var carIds = repository.FindCarsReservedDuringDate(currentDateToUse);
+
                 carIds.Should().BeEmpty();
             }
 
             [Test]
-            public void WhenThereAreNoReservationsInTheInformedInterval_ReturnsEmptyList() 
+            public void WhenReservationStartsPriorAndEndsBeforeInformedDate_ReturnsEmptyList()
             {
+                // Arrange
+                var reservationDate = currentDateToUse.AddMinutes(5);
+                var reservationDurationInMinutes = 30;
+                var dateToSearchFor = reservationDate.AddMinutes(reservationDurationInMinutes + 1);
+
                 var repository = new ReservationRepository();
-                var reservation = ReservationOutsideInterval();
+                var reservation = new ReservationBuilder()
+                    .WithInitialDate(reservationDate)
+                    .WithDurationInMinutes(reservationDurationInMinutes)
+                    .Build();
 
                 repository.Add(reservation);
 
-                var carIds = repository.FindCarsReservedInInterval(intervalBeginning, intervalEnding);
+                // Act
+                var carIds = repository.FindCarsReservedDuringDate(dateToSearchFor);
+
+                // Assert
                 carIds.Should().BeEmpty();
             }
 
             [Test]
-            public void WhenThereIsSingleReservationInTheInformedInterval_ReturnsCarIdOfReservation()
+            public void WhenReservationStartsPriorAndEndsAfterInformedDate_ReturnsTheReservationCarId()
             {
+                // Arrange
+                var durationInMinutes = 80;
+                var dateToSearch = currentDateToUse.AddMinutes(durationInMinutes - 5);
                 var repository = new ReservationRepository();
-                var reservationInInterval = ReservationInsideInterval();
-                var reservationOutsideInterval = ReservationOutsideInterval();
 
-                repository.Add(reservationInInterval);
-                repository.Add(reservationOutsideInterval);
+                var reservation1 = new ReservationBuilder()
+                    .WithCarId("C1")
+                    .WithInitialDate(currentDateToUse)
+                    .WithDurationInMinutes(durationInMinutes)
+                    .Build();
 
-                var carIds = repository.FindCarsReservedInInterval(intervalBeginning, intervalEnding);
-                
-                carIds.Should().HaveCount(1).And.Contain(x => x == reservationInInterval.CarId);
+                repository.Add(reservation1);
+
+                // Act
+                var result = repository.FindCarsReservedDuringDate(dateToSearch).ToList();
+
+                // Assert
+                result.Should().NotBeEmpty().And.Contain(x => x == reservation1.CarId);
             }
 
             [Test]
-            public void WhenThereIsMultipleReservationsInTheInformedInterval_ReturnsCarIdOfSpecificReservations()
+            public void WhenReservationStartsPriorAndEndsExactlyAtTheInformedDate_ReturnsTheReservationCarId()
             {
+                // Arrange
+                var durationInMinutes = 80;
+                var dateToSearch = currentDateToUse.AddMinutes(durationInMinutes);
                 var repository = new ReservationRepository();
-                var reservationInInterval1 = ReservationInsideInterval();
-                var reservationInInterval2 = ReservationInsideInterval();
-                var reservationOutsideInterval1 = ReservationOutsideInterval();
-                var reservationOutsideInterval2 = ReservationOutsideInterval();
 
-                repository.Add(reservationInInterval1);
-                repository.Add(reservationOutsideInterval1);
+                var reservation1 = new ReservationBuilder()
+                    .WithCarId("C1")
+                    .WithInitialDate(currentDateToUse)
+                    .WithDurationInMinutes(durationInMinutes)
+                    .Build();
 
-                repository.Add(reservationInInterval2);
-                repository.Add(reservationOutsideInterval2);
+                repository.Add(reservation1);
 
-                var carIds = repository.FindCarsReservedInInterval(intervalBeginning, intervalEnding);
+                // Act
+                var result = repository.FindCarsReservedDuringDate(dateToSearch).ToList();
 
-                carIds.Should().HaveCount(2)
-                    .And
-                    .Contain(x => x == reservationInInterval1.CarId)
-                    .And
-                    .Contain(x => x == reservationInInterval2.CarId);
+                // Assert
+                result.Should().NotBeEmpty().And.Contain(x => x == reservation1.CarId);
             }
 
             [Test]
-            public void WhenAllReservationsAreInTheInformedInterval_ReturnsCarIdOfAllReservations()
+            public void WhenMultipleReservationsStartsPriorAndEndsAfterInformedDate_ReturnsCarIdThoseReservations()
             {
+                // Arrange
                 var repository = new ReservationRepository();
-                var reservationInInterval1 = ReservationInsideInterval();
-                var reservationInInterval2 = ReservationInsideInterval();
-                var reservationInInterval3 = ReservationInsideInterval();
+                var dateToSearch = currentDateToUse.AddMinutes(40);
 
-                repository.Add(reservationInInterval1);
-                repository.Add(reservationInInterval2);
-                repository.Add(reservationInInterval3);
+                var reservationEndsBeforeDate = new ReservationBuilder()
+                    .WithInitialDate(currentDateToUse.AddMinutes(1))
+                    .WithDurationInMinutes(30)
+                    .Build();
 
-                var carIds = repository.FindCarsReservedInInterval(intervalBeginning, intervalEnding);
+                var reservationEndsAfterDate1 = new ReservationBuilder()
+                    .WithInitialDate(currentDateToUse.AddMinutes(5))
+                    .WithDurationInMinutes(40)
+                    .Build();
 
+                var reservationEndsAfterDate2 = new ReservationBuilder()
+                    .WithInitialDate(currentDateToUse.AddMinutes(1))
+                    .WithDurationInMinutes(55)
+                    .Build();
+
+                var reservationEndsAfterDate3 = new ReservationBuilder()
+                    .WithInitialDate(currentDateToUse.AddMinutes(5))
+                    .WithDurationInMinutes(60)
+                    .Build();
+
+                repository.Add(reservationEndsBeforeDate);
+                repository.Add(reservationEndsAfterDate1);
+
+                repository.Add(reservationEndsAfterDate2);
+                repository.Add(reservationEndsAfterDate3);
+
+                // Act
+                var carIds = repository.FindCarsReservedDuringDate(dateToSearch);
+
+                // Assert
                 carIds.Should().HaveCount(3)
                     .And
-                    .Contain(x => x == reservationInInterval1.CarId)
+                    .Contain(x => x == reservationEndsAfterDate1.CarId)
                     .And
-                    .Contain(x => x == reservationInInterval2.CarId)
+                    .Contain(x => x == reservationEndsAfterDate2.CarId)
                     .And
-                    .Contain(x => x == reservationInInterval3.CarId);
+                    .Contain(x => x == reservationEndsAfterDate3.CarId);
             }
 
-            private Reservation ReservationInsideInterval() 
+            [Test]
+            public void WhenReservationStartsAndEndsAfterInformedDate_ReturnsEmptyList()
             {
-                var initialDateInsideDesiredInterval = intervalBeginning.AddMinutes(5);
+                // Arrange
+                var repository = new ReservationRepository();
+                var dateToSearch = currentDateToUse;
 
-                return new ReservationBuilder()
-                    .WithInitialDate(initialDateInsideDesiredInterval)
+                var reservation1 = new ReservationBuilder()
+                    .WithCarId("C1")
+                    .WithInitialDate(currentDateToUse.AddMinutes(5))
+                    .WithDurationInMinutes(80)
+                    .Build();
+
+                repository.Add(reservation1);
+
+                // Act
+                var result = repository.FindCarsReservedDuringDate(dateToSearch).ToList();
+
+                // Assert
+                result.Should().BeEmpty();
+            }
+
+            [Test]
+            public void WhenMultipleReservationsStartPriorAndEndsBeforeAndStartsAfterAndEndAfterInformedDate_ReturnsEmptyList()
+            {
+                // Arrange
+                var repository = new ReservationRepository();
+                var dateToSearch = currentDateToUse.AddMinutes(30);
+
+                var reservationStartsPriorAndEndBefore1 = new ReservationBuilder()
+                    .WithInitialDate(currentDateToUse)
                     .WithDurationInMinutes(20)
                     .Build();
+
+                var reservationStartsPriorAndEndBefore2 = new ReservationBuilder()
+                    .WithInitialDate(dateToSearch.AddHours(-2))
+                    .WithDurationInMinutes(60)
+                    .Build();
+
+                var reservationStartsAfterEndsAfterDate1 = new ReservationBuilder()
+                    .WithInitialDate(dateToSearch.AddMinutes(1))
+                    .WithDurationInMinutes(40)
+                    .Build();
+
+                var reservationStartsAfterEndsAfterDate2 = new ReservationBuilder()
+                  .WithInitialDate(dateToSearch.AddHours(1))
+                  .WithDurationInMinutes(60)
+                  .Build();
+
+                repository.Add(reservationStartsAfterEndsAfterDate1);
+                repository.Add(reservationStartsAfterEndsAfterDate2);
+
+                repository.Add(reservationStartsPriorAndEndBefore1);
+                repository.Add(reservationStartsPriorAndEndBefore2);
+
+                // Act
+                var carIds = repository.FindCarsReservedDuringDate(dateToSearch);
+
+                // Assert
+                carIds.Should().BeEmpty();
             }
 
-            private Reservation ReservationOutsideInterval()
+            [Test]
+            public void WhenMultipleReservationsStartPriorAndEndAfterAndStartsAfterAndEndAfterInformedDate_ReturnsOnlyTheOnesThatStartsPrior()
             {
-                var initialDateOutsideDesiredInterval = intervalEnding.AddHours(1);
+                // Arrange
+                var repository = new ReservationRepository();
+                var dateToSearch = currentDateToUse;
 
-                return new ReservationBuilder()
-                    .WithInitialDate(initialDateOutsideDesiredInterval)
+                var reservationStartsPriorEndsAfter1 = new ReservationBuilder()
+                    .WithInitialDate(dateToSearch.AddMinutes(-10))
+                    .WithDurationInMinutes(20)
+                    .Build();
+
+                var reservationStartsPriorEndsAfter2 = new ReservationBuilder()
+                    .WithInitialDate(dateToSearch.AddMinutes(-30))
                     .WithDurationInMinutes(120)
                     .Build();
+
+                var reservationStartsAfterEndsAfter1 = new ReservationBuilder()
+                    .WithInitialDate(dateToSearch.AddMinutes(1))
+                    .WithDurationInMinutes(40)
+                    .Build();
+
+                var reservationStartsAfterEndsAfter2 = new ReservationBuilder()
+                  .WithInitialDate(dateToSearch.AddHours(1))
+                  .WithDurationInMinutes(60)
+                  .Build();
+
+                repository.Add(reservationStartsAfterEndsAfter1);
+                repository.Add(reservationStartsAfterEndsAfter2);
+
+                repository.Add(reservationStartsPriorEndsAfter1);
+                repository.Add(reservationStartsPriorEndsAfter1);
+
+                // Act
+                var carIds = repository.FindCarsReservedDuringDate(dateToSearch);
+
+                // Assert
+                carIds.Should().HaveCount(2)
+                    .And
+                    .Contain(x => x == reservationStartsPriorEndsAfter1.CarId)
+                    .And
+                    .Contain(x => x == reservationStartsPriorEndsAfter1.CarId);
             }
         }
     }

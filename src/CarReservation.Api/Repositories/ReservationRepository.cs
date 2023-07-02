@@ -30,9 +30,9 @@ namespace CarReservation.Api.Repositories
 
         public IEnumerable<Reservation> GetAll() => Database.Values;
 
-        public IEnumerable<string> FindCarsReservedInInterval(DateTime reservationBeginning, DateTime reservationEnding) =>
-             Database.Values
-                     .Where(x => reservationBeginning <= x.InitialDate && x.EndDate <= reservationEnding)
-                     .Select(x => x.CarId);  
+        public IEnumerable<string> FindCarsReservedDuringDate(DateTime desiredDate) =>
+                Database.Values
+                     .Where(x => x.InitialDate <= desiredDate && desiredDate <= x.EndDate)
+                     .Select(x => x.CarId);
     }
 }

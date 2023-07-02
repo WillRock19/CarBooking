@@ -45,10 +45,16 @@ namespace CarReservation.Api.Services
             return carRepository.Add(carEntity);
         }
 
-        public CarResponse UpdateCar(string carId, CreateCarRequest carRequest)
+        public CarResponse UpdateCar(string carId, CreateCarRequest updatedCarRequest)
         {
-            var _ = carRepository.GetById(carId) ?? throw new KeyNotFoundException($"Operation cannot be completed. There's no car with {carId}");
-            var carUpdated = carRepository.Update(mapper.Map<Car>(carRequest) with 
+            if(string.IsNullOrEmpty(carId))
+                throw new ArgumentNullException(nameof(carId));
+
+            if (updatedCarRequest == null)
+                throw new ArgumentNullException(nameof(updatedCarRequest));
+
+            var _ = carRepository.GetById(carId) ?? throw new KeyNotFoundException($"Operation cannot be completed. There's no car with ID '{carId}'.");
+            var carUpdated = carRepository.Update(mapper.Map<Car>(updatedCarRequest) with 
             { 
                 Id = carId 
             });
@@ -66,10 +72,10 @@ namespace CarReservation.Api.Services
                 .ValidateAsync(reservation);
             
             if(!validationResult.IsValid)
-                return new CreateReservationResponse(null, BuildReservationValidErrorMessage(validationResult.Errors));
+                return new CreateReservationResponse(null, null, BuildReservationValidErrorMessage(validationResult.Errors));
 
             var carsReservedInIntervalSet = new HashSet<string>(reservationRepository
-                .FindCarsReservedInInterval(reservation.InitialDate, reservation.EndDate));
+                .FindCarsReservedDuringDate(reservation.InitialDate));
 
             var carsAvailableForReservation = carRepository
                 .GetAll()
@@ -77,24 +83,17 @@ namespace CarReservation.Api.Services
                 .ToList();
 
             if (!carsAvailableForReservation.Any()) 
-                return new CreateReservationResponse(null, "There's no car available for the desired date and time.");
+                return new CreateReservationResponse(null, null, "There's no car available for the desired date and time.");
 
             var carToReserve = carsAvailableForReservation.First();
             var reservationId = reservationRepository.Add(reservation with { CarId = carToReserve.Id });
-            var successMessage = $"Reservation successfully created for date {reservation.InitialDate}. Your reservation ID is: {reservationId}.";
+            var successMessage = $"Reservation successfully created for {reservation.InitialDate}. Your reservation ID is: {reservationId}.";
 
-            var result = new CreateReservationResponse(reservationId, successMessage);
-            return result;
+            return new CreateReservationResponse(reservationId, carToReserve.Id, successMessage);
         }
 
         public IEnumerable<ReservationResponse> AllCarReservationsUntil(DateTime? limitDate) 
         {
-            var cars = carRepository .GetAll().ToList();
-            var a = reservationRepository.GetAll().ToList();
-            var b = reservationRepository.GetAll().Where(x => x.InitialDate <= limitDate!.Value).ToList();
-
-
-
             var reservations = limitDate.HasValue 
                 ? reservationRepository.GetAll().Where(x => x.InitialDate <= limitDate.Value) 
                 : reservationRepository.GetAll();

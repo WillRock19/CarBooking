@@ -7,7 +7,6 @@ namespace CarReservation.Api.Tests.Unit.Builders.Models
         private Guid reservationId;
         private string? carId;
         private DateTime? initialDate;
-        private DateTime? endDate;
         private TimeSpan? durationInMinutes;
         private bool emptyInitialDate;
 
@@ -55,16 +54,10 @@ namespace CarReservation.Api.Tests.Unit.Builders.Models
                 reservationId,
                 carId ?? $"C{new Random().Next()}",
                 initialDate ?? defaultInitialDate,
-                DurationOfCustomizedInterval() ?? durationOfReservation
+                durationOfReservation
             );
         }
 
         private TimeSpan RandomMinutesUpToTwoHours() => TimeSpan.FromMinutes(new Random().Next(1, 120));
-
-        private TimeSpan? DurationOfCustomizedInterval() => initialDate != null && endDate != null
-            ? TimeSpan.FromMinutes((endDate.Value - initialDate.Value).TotalMinutes)
-            : null;
-
-
     }
 }

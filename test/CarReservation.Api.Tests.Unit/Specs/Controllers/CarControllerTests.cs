@@ -167,7 +167,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
             [Test]
             public async Task WhenCreateReservationRequestIsNull_ReturnsBadRequestWithMessage()
             {
-                var result = await _carController.CreateReservation(null);
+                var result = await _carController.CreateReservation(null!);
                 var resultAsBadRequest = (BadRequestObjectResult)result;
 
                 resultAsBadRequest.StatusCode.Should().Be(400);

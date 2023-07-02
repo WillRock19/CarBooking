@@ -92,7 +92,7 @@ namespace CarReservation.Api.Services
             return new CreateReservationResponse(reservationId, carToReserve.Id, successMessage);
         }
 
-        public IEnumerable<ReservationResponse> AllCarReservationsUntil(DateTime? limitDate) 
+        public IEnumerable<ReservationResponse> AllUpcomingReservationsUntil(DateTime? limitDate) 
         {
             var reservations = limitDate.HasValue 
                 ? reservationRepository.GetAll().Where(x => x.InitialDate <= limitDate.Value) 

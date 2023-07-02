@@ -10,6 +10,8 @@ namespace CarReservation.Api.Interfaces.Repositories
 
         IEnumerable<Reservation> GetAll();
 
+        IEnumerable<Reservation> GetUpcomingReservations(ICurrentDate currentDate);
+
         IEnumerable<string> FindCarsReservedDuringDate(DateTime desiredDate);
     }
 }

@@ -17,6 +17,6 @@ namespace CarReservation.Api.Interfaces.Infraestructure
 
         Task<CreateReservationResponse> ReserveCarAsync(CreateReservationRequest reservationRequest);
 
-        IEnumerable<ReservationResponse> AllCarReservationsUntil(DateTime? limitDate);
+        IEnumerable<ReservationResponse> AllUpcomingReservationsUntil(DateTime? limitDate);
     }
 }

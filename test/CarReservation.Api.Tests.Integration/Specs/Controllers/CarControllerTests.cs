@@ -335,7 +335,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 reservationResult6.EnsureSuccessStatusCode();
 
                 // Act
-                var result = await _clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations?untilDate={dateLimitToSearch}");
+                var result = await _clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations?limitDate={dateLimitToSearch}");
                 result.EnsureSuccessStatusCode();
 
                 // Assert

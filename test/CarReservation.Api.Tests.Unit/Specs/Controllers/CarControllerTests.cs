@@ -34,11 +34,10 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
             [TestCase("")]
             public void WhenCarIdIsNullOrEmpty_ReturnsBadRequestWithMessage(string carId)
             {
-                var result = _carController.GetById(carId);
-                var resultAsBadRequest = (BadRequestObjectResult)result;
+                var resultAsBadRequest = _carController.GetById(carId).Result as BadRequestObjectResult;
 
-                resultAsBadRequest.StatusCode.Should().Be(400);
-                resultAsBadRequest.Value.Should().Be("Query parameter car_id cannot be null or empty.");
+                resultAsBadRequest?.StatusCode.Should().Be(400);
+                resultAsBadRequest?.Value.Should().Be("Query parameter car_id cannot be null or empty.");
             }
         }
 
@@ -151,14 +150,14 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
                 const string exceptionMessage = "Some exception message";
                 var dateLimit = DateTime.UtcNow.AddHours(5);
 
-                _carServiceMock.Setup(x => x.AllCarReservationsUntil(dateLimit))
+                _carServiceMock.Setup(x => x.AllUpcomingReservationsUntil(dateLimit))
                     .Throws(new Exception(exceptionMessage));
 
-                var result = _carController.GetUpcomingReservations(dateLimit);
-                var resultAsBadRequest = (BadRequestObjectResult)result;
+                var resultAsBadRequest = _carController
+                    .GetUpcomingReservations(dateLimit).Result as BadRequestObjectResult;
 
-                resultAsBadRequest.StatusCode.Should().Be(400);
-                resultAsBadRequest.Value.Should().Be(exceptionMessage);
+                resultAsBadRequest?.StatusCode.Should().Be(400);
+                resultAsBadRequest?.Value.Should().Be(exceptionMessage);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using CarReservation.Api.Interfaces.Repositories;
+﻿using CarReservation.Api.Interfaces;
+using CarReservation.Api.Interfaces.Repositories;
 using CarReservation.Api.Models.Domain;
 
 namespace CarReservation.Api.Repositories
@@ -29,6 +30,10 @@ namespace CarReservation.Api.Repositories
         }
 
         public IEnumerable<Reservation> GetAll() => Database.Values;
+
+        public IEnumerable<Reservation> GetUpcomingReservations(ICurrentDate currentDate) =>
+            Database.Values
+                .Where(x => x.InitialDate > currentDate.DateUtcNow());
 
         public IEnumerable<string> FindCarsReservedDuringDate(DateTime desiredDate) =>
                 Database.Values

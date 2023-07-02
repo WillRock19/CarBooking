@@ -238,7 +238,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             }
         }
 
-        internal class AllCarReservationsUntil : CarServiceTests 
+        internal class AllUpcomingReservationsUntil : CarServiceTests 
         {
             private CarService _service;
             private IMapper _realMapper;
@@ -267,7 +267,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             {
                 var limitDate = (DateTime?)null;
 
-                var result = _service.AllCarReservationsUntil(limitDate);
+                var result = _service.AllUpcomingReservationsUntil(limitDate);
 
                 result.Should().HaveCount(_reservationsInDatabase.Count())
                     .And
@@ -285,7 +285,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var limitDate = DateTime.UtcNow.AddHours(9);
                 var expectedResult = _reservationsInDatabase.Where(x => x.CarId != "C5" && x.CarId != "C6");
 
-                var result = _service.AllCarReservationsUntil(limitDate);
+                var result = _service.AllUpcomingReservationsUntil(limitDate);
 
                 result.Should().HaveCount(4)
                     .And

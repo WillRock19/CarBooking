@@ -103,10 +103,9 @@ namespace CarReservation.Api.Services
 
         private string BuildReservationValidErrorMessage(List<ValidationFailure> validationFailures) 
         {
-            var errorMessage = new StringBuilder();
-            errorMessage.AppendLine("The reservation cannot be made. The following errors occured: ");
+            var errorMessage = new StringBuilder("The reservation cannot be made. The following errors occured: ");
 
-            validationFailures.ForEach(failure => errorMessage.AppendLine($"* {failure.ErrorMessage}"));
+            validationFailures.ForEach(failure => errorMessage.Append($"\n* {failure.ErrorMessage}"));
             return errorMessage.ToString();
         }
     }

@@ -138,7 +138,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 // Arrange
                 const string firstErrorMessage = "First error that occured";
                 const string secondErrorMessage = "Second error that occured";
-                var expectedErrorMessage = $"The reservation cannot be made. The following errors occured: \r\n* {firstErrorMessage}\r\n* {secondErrorMessage}\r\n";
+                var expectedErrorMessage = $"The reservation cannot be made. The following errors occured: \n* {firstErrorMessage}\n* {secondErrorMessage}";
                 
                 var fakeReservationRequest = new CreateReservationRequestBuilder().Build();
                 var fakeInvalidReservation = new ReservationBuilder().Build();

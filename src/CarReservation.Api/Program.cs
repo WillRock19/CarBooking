@@ -1,4 +1,7 @@
+using CarReservation.Api.Infraestructure;
 using CarReservation.Api.Interfaces;
+using CarReservation.Api.Interfaces.Infraestructure;
+using CarReservation.Api.Interfaces.Repositories;
 using CarReservation.Api.Models.Mapper;
 using CarReservation.Api.Models.Validations;
 using CarReservation.Api.Repositories;
@@ -13,11 +16,15 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddValidatorsFromAssemblyContaining<CarRequestValidator>();
+builder.Services.AddSingleton<ICurrentDate, CurrentDate>();
 builder.Services.AddSingleton<ICarRepository, CarRepository>();
+builder.Services.AddSingleton<IReservationRepository, ReservationRepository>();
 builder.Services.AddScoped<ICarService, CarService>();
+
 builder.Services.AddAutoMapper(config =>
 {
-    config.AddProfile<MappingProfile>();
+    config.AddProfile<CarProfile>();
+    config.AddProfile<ReservationProfile>();
 });
 
 var app = builder.Build();

@@ -1,11 +1,11 @@
-﻿using CarReservation.Api.Interfaces;
+﻿using CarReservation.Api.Interfaces.Repositories;
 using CarReservation.Api.Models.Domain;
 
 namespace CarReservation.Api.Repositories
 {
     public class CarRepository : ICarRepository
     {
-        private int LatestRegisterCount;
+        private long LatestRegisterCount;
         private readonly Dictionary<string, Car> Database;
 
         public CarRepository()

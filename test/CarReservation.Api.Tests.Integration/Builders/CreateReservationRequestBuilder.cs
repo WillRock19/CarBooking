@@ -34,7 +34,6 @@ namespace CarReservation.Api.Tests.Integration.Builders
             return this;
         }
 
-
         internal CreateReservationRequest Build() => new()
         {
             ReservationDate = emptyReservationDate

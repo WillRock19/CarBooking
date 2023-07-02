@@ -2,30 +2,30 @@
 
 # Introduction
 
-At this moment, this project is a basic Reservation API. The idea is to allow any user that sends a request to reserv a car to be used at a specific moment in time in the next 24 hours.
+At this moment, this project is a basic Reservation API. The idea is to allow any user that sends a request to reserve a car during a specific time in the next 24 hours.
 
 This API supports basically two flows:
 
-* Car CRUD flow - basically, all operations of Create, Update, Remove, GetAll (without pagination) and GetById associated with the car entity;
-* Reservation flow - basically, the reservation of a car for a specific moment in time and a GetAll upcoming reservations;
+* Car flow - basically, all CRUD operations associated with a car, like Create, Update, Remove, GetAll (without pagination) and GetById;
+* Reservation flow - basically, operations associated with the reservation of a car, like reserving for a specific moment in time and a GetAll upcoming reservations;
 
-All API communication is made via **JSON** objects.
+All APIs communication should be made using **JSON** objects.
 
 # Domain
 
-There's a couple of rules important to understand about how the car and the reservations work. In this section, we'll explain them.
+There's a couple of rules important to understand about how the car and the reservations works. In this section, we'll explain them.
 
 ## Car
 
-The car is represented by a **Make**, a **Model** and an **ID**, which should follow the pattern **C<number>** for each car.
+The car is represented by a **Make**, a **Model** and an **ID**, which is a string that follows the pattern **C<number>**.
 
 ## Reservation
 
 The reservation is always associated with a car. If no car exists, an error message is return for a user that tries to register a Reservation.
 
-The reservation is represented by an **Id**, a **CarId**, an **InitialDate**, a **DurationInMinutes** and an **EndDate**, which is computed using the InitialDate and the DurationInMinutes.
+The reservation is represented by an **Id**, which is a Guid, a **CarId**, an **InitialDate**, a **DurationInMinutes** and an **EndDate**, which is computed using the InitialDate + DurationInMinutes.
 
-The reservation can be taken up to 24 hours ahead and have a duration up to 2 hours (e.g. if now you are at 10 AM of a Saturday, your reservation can be made until 10 AM of Sunday and have the maximum duration of 2 hours).
+The reservation can be taken up to 24 hours ahead and have a duration up to 2 hours (e.g. if now you are at 10 AM of a Saturday, your reservation can be made at most for 10 AM of Sunday and have the maximum duration of 2 hours).
 
 # How to run
 

@@ -277,7 +277,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
             {
                 // Assert
                 var currentDate = DateTime.UtcNow;
-                var dataCreated = await SetUpFourReservationsForFourCarsAtTheSameDate(currentDate);
+                var dataCreated = await SetUpFourCarsAndFourReservationsForTheSameDate(currentDate);
 
                 // Act
                 var result = await clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations");
@@ -314,7 +314,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                     dateReservation4,
                 };
 
-                await SetUpFourCarsToReserve();
+                await SetUpFourCarsToBeUsed();
 
                 var reservationResult1 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation1, 80));
                 reservationResult1.EnsureSuccessStatusCode();
@@ -348,9 +348,9 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                     .Contain(upcomingReservation => expectedDatesToRetrieve.Any(date => date == upcomingReservation.InitialDate));
             }
 
-            private async Task<List<CreateReservationResponse>> SetUpFourReservationsForFourCarsAtTheSameDate(DateTime referenceDate)
+            private async Task<List<CreateReservationResponse>> SetUpFourCarsAndFourReservationsForTheSameDate(DateTime referenceDate)
             {
-                await SetUpFourCarsToReserve();
+                await SetUpFourCarsToBeUsed();
 
                 var reservationPostContent1 = CreateReservationRequestAsContentString(referenceDate, 80);
                 var reservationPostContent2 = CreateReservationRequestAsContentString(referenceDate, 55);
@@ -393,7 +393,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 return new StringContent(JsonConvert.SerializeObject(reservationRequest), Encoding.UTF8, AcceptedContentType);
             }
 
-            private async Task SetUpFourCarsToReserve() 
+            private async Task SetUpFourCarsToBeUsed() 
             {
                 var carRequest1 = new CreateCarRequestBuilder().WithMake("First Car Make").WithModel("First Car Model").Build();
                 var createCarPostContent1 = new StringContent(JsonConvert.SerializeObject(carRequest1), Encoding.UTF8, AcceptedContentType);

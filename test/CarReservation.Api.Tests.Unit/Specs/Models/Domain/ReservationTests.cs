@@ -1,6 +1,8 @@
-﻿using CarReservation.Api.Models.Domain;
+﻿using CarReservation.Api.Interfaces;
+using CarReservation.Api.Models.Domain;
 using CarReservation.Api.Tests.Unit.Builders.Models;
 using FluentAssertions;
+using Moq;
 using NUnit.Framework;
 
 namespace CarReservation.Api.Tests.Unit.Specs.Models.Domain
@@ -24,22 +26,32 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Domain
 
         internal class StartsInTwentyFourHoursOrLess : ReservationTests 
         {
+            private DateTime _currentDateUtc;
+            private Mock<ICurrentDate> _currentDateMock;
+
+            [SetUp]
+            public void SetUp() 
+            {
+                _currentDateUtc = DateTime.UtcNow;
+                _currentDateMock = new Mock<ICurrentDate>();
+
+                _currentDateMock.Setup(x => x.DateUtcNow()).Returns(_currentDateUtc);
+            }
+
             [Test]
             public void WhenInitialDateIsLessOrEqualToTwentyFourHoursFromNow_ReturnsTrue()
             {
-                var currentDate = DateTime.UtcNow;
+                var reservation1 = new ReservationBuilder().WithInitialDate(_currentDateUtc).Build();
+                var reservation2 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(5)).Build();
+                var reservation3 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddMinutes(500)).Build();
+                var reservation4 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddHours(23)).Build();
+                var reservation5 = new ReservationBuilder().WithInitialDate(_currentDateUtc.AddHours(24)).Build();
 
-                var reservation1 = new ReservationBuilder().WithInitialDate(currentDate).Build();
-                var reservation2 = new ReservationBuilder().WithInitialDate(currentDate.AddMinutes(5)).Build();
-                var reservation3 = new ReservationBuilder().WithInitialDate(currentDate.AddMinutes(500)).Build();
-                var reservation4 = new ReservationBuilder().WithInitialDate(currentDate.AddHours(23)).Build();
-                var reservation5 = new ReservationBuilder().WithInitialDate(currentDate.AddHours(24)).Build();
-
-                reservation1.StartsInTwentyFourHoursOrLess().Should().BeTrue();
-                reservation2.StartsInTwentyFourHoursOrLess().Should().BeTrue();
-                reservation3.StartsInTwentyFourHoursOrLess().Should().BeTrue();
-                reservation4.StartsInTwentyFourHoursOrLess().Should().BeTrue();
-                reservation5.StartsInTwentyFourHoursOrLess().Should().BeTrue();
+                reservation1.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeTrue();
+                reservation2.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeTrue();
+                reservation3.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeTrue();
+                reservation4.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeTrue();
+                reservation5.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeTrue();
             }
 
             [Test]
@@ -53,11 +65,11 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Domain
                 var reservation4 = new ReservationBuilder().WithInitialDate(currentDate.AddHours(25)).Build();
                 var reservation5 = new ReservationBuilder().WithInitialDate(currentDate.AddHours(40)).Build();
 
-                reservation1.StartsInTwentyFourHoursOrLess().Should().BeFalse();
-                reservation2.StartsInTwentyFourHoursOrLess().Should().BeFalse();
-                reservation3.StartsInTwentyFourHoursOrLess().Should().BeFalse();
-                reservation4.StartsInTwentyFourHoursOrLess().Should().BeFalse();
-                reservation5.StartsInTwentyFourHoursOrLess().Should().BeFalse();
+                reservation1.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeFalse();
+                reservation2.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeFalse();
+                reservation3.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeFalse();
+                reservation4.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeFalse();
+                reservation5.StartsInTwentyFourHoursOrLess(_currentDateMock.Object).Should().BeFalse();
             }
         }
 

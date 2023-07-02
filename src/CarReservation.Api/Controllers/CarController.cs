@@ -1,4 +1,4 @@
-﻿using CarReservation.Api.Interfaces;
+﻿using CarReservation.Api.Interfaces.Infraestructure;
 using CarReservation.Api.Models.DTO.Request;
 using CarReservation.Api.Models.DTO.Response;
 using FluentValidation;

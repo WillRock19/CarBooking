@@ -154,20 +154,20 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
 
         internal class CarReservation : CarControllerTests 
         {
-            private TestServer reservationTestServer;
-            private HttpClient clientTestServer;
+            private TestServer _reservationTestServer;
+            private HttpClient _clientTestServer;
 
             [SetUp]
             public void SetUp() 
             {
-                reservationTestServer = new WebApplicationFactory<Program>()
+                _reservationTestServer = new WebApplicationFactory<Program>()
                     .WithWebHostBuilder(builder =>
                     {
                         builder.UseEnvironment("Testing");
                     })
                     .Server;
 
-                clientTestServer = reservationTestServer.CreateClient();
+                _clientTestServer = _reservationTestServer.CreateClient();
             }
 
             [Test]
@@ -226,7 +226,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var createReservationPostContent = new StringContent(JsonConvert.SerializeObject(reservationRequest), Encoding.UTF8, AcceptedContentType);
 
                 // Act
-                var createReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent);
+                var createReservationResult = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", createReservationPostContent);
                 var resultContent = JsonConvert.DeserializeObject<CreateReservationResponse>(await createReservationResult.Content.ReadAsStringAsync());
 
                 // Assert
@@ -242,7 +242,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var carRequest = new CreateCarRequestBuilder().WithMake("First Make").Build();
                 var createCarPostContent = new StringContent(JsonConvert.SerializeObject(carRequest), Encoding.UTF8, AcceptedContentType);
 
-                var createCarResult = await clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent);
+                var createCarResult = await _clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent);
                 createCarResult.EnsureSuccessStatusCode();
 
                 var reservationDate = DateTime.UtcNow.AddHours(5);
@@ -259,11 +259,11 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var firstReservationPostContent = new StringContent(JsonConvert.SerializeObject(firstReservationRequest), Encoding.UTF8, AcceptedContentType);
                 var secondReservationPostContent = new StringContent(JsonConvert.SerializeObject(secondReservationRequest), Encoding.UTF8, AcceptedContentType);
 
-                var firstReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", firstReservationPostContent);
+                var firstReservationResult = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", firstReservationPostContent);
                 firstReservationResult.EnsureSuccessStatusCode();
 
                 // Act
-                var secondReservationResult = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", secondReservationPostContent);
+                var secondReservationResult = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", secondReservationPostContent);
                 var resultContent = JsonConvert.DeserializeObject<CreateReservationResponse>(await secondReservationResult.Content.ReadAsStringAsync());
 
                 // Assert
@@ -280,7 +280,7 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var dataCreated = await SetUpFourCarsAndFourReservationsForTheSameDate(currentDate);
 
                 // Act
-                var result = await clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations");
+                var result = await _clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations");
                 result.EnsureSuccessStatusCode();
 
                 // Assert
@@ -316,26 +316,26 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
 
                 await SetUpFourCarsToBeUsed();
 
-                var reservationResult1 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation1, 80));
+                var reservationResult1 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation1, 80));
                 reservationResult1.EnsureSuccessStatusCode();
 
-                var reservationResult2 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation2, 55));
+                var reservationResult2 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation2, 55));
                 reservationResult2.EnsureSuccessStatusCode();
 
-                var reservationResult3 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation3, 90));
+                var reservationResult3 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation3, 90));
                 reservationResult3.EnsureSuccessStatusCode();
 
-                var reservationResult4 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation4, 110));
+                var reservationResult4 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation4, 110));
                 reservationResult4.EnsureSuccessStatusCode();
 
-                var reservationResult5 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation5, 60));
+                var reservationResult5 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation5, 60));
                 reservationResult5.EnsureSuccessStatusCode();
 
-                var reservationResult6 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation6, 120));
+                var reservationResult6 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", CreateReservationRequestAsContentString(dateReservation6, 120));
                 reservationResult6.EnsureSuccessStatusCode();
 
                 // Act
-                var result = await clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations?untilDate={dateLimitToSearch}");
+                var result = await _clientTestServer.GetAsync($"{EndpointBaseRoute}/reservations?untilDate={dateLimitToSearch}");
                 result.EnsureSuccessStatusCode();
 
                 // Assert
@@ -357,16 +357,16 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var reservationPostContent3 = CreateReservationRequestAsContentString(referenceDate, 110);
                 var reservationPostContent4 = CreateReservationRequestAsContentString(referenceDate, 120);
 
-                var reservationResult1 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", reservationPostContent1);
+                var reservationResult1 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", reservationPostContent1);
                 reservationResult1.EnsureSuccessStatusCode();
 
-                var reservationResult2 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", reservationPostContent2);
+                var reservationResult2 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", reservationPostContent2);
                 reservationResult2.EnsureSuccessStatusCode();
 
-                var reservationResult3 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", reservationPostContent3);
+                var reservationResult3 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", reservationPostContent3);
                 reservationResult3.EnsureSuccessStatusCode();
 
-                var reservationResult4 = await clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", reservationPostContent4);
+                var reservationResult4 = await _clientTestServer.PostAsync($"{EndpointBaseRoute}/reservations", reservationPostContent4);
                 reservationResult4.EnsureSuccessStatusCode();
 
                 var createReservationResponse1 = JsonConvert.DeserializeObject<CreateReservationResponse>(await reservationResult1.Content.ReadAsStringAsync());
@@ -407,17 +407,17 @@ namespace CarReservation.Api.Tests.Api.Specs.Controllers
                 var carRequest4 = new CreateCarRequestBuilder().WithMake("Fourth Car Make").WithModel("Fourth Car Model").Build();
                 var createCarPostContent4 = new StringContent(JsonConvert.SerializeObject(carRequest4), Encoding.UTF8, AcceptedContentType);
 
-                (await clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent1)).EnsureSuccessStatusCode();
-                (await clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent2)).EnsureSuccessStatusCode();
-                (await clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent3)).EnsureSuccessStatusCode();
-                (await clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent4)).EnsureSuccessStatusCode();
+                (await _clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent1)).EnsureSuccessStatusCode();
+                (await _clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent2)).EnsureSuccessStatusCode();
+                (await _clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent3)).EnsureSuccessStatusCode();
+                (await _clientTestServer.PostAsync(EndpointBaseRoute, createCarPostContent4)).EnsureSuccessStatusCode();
             }
 
             [TearDown]
             public void TearDown() 
             {
-                clientTestServer?.Dispose();
-                reservationTestServer?.Dispose();
+                _clientTestServer?.Dispose();
+                _reservationTestServer?.Dispose();
             }            
         }       
     }

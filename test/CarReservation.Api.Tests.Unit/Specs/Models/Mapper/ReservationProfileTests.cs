@@ -11,23 +11,23 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
 {
     internal class ReservationProfileTests
     {
-        private readonly MapperConfiguration configuration;
-        private readonly IMapper mapper;
+        private readonly MapperConfiguration _configuration;
+        private readonly IMapper _mapper;
 
         public ReservationProfileTests()
         {
-            configuration = new MapperConfiguration(cfg =>
+            _configuration = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<ReservationProfile>();
             });
 
-            mapper = configuration.CreateMapper();
+            _mapper = _configuration.CreateMapper();
         }
 
         [Test]
         public void Profile_ShouldBeCorrectlyConfigured()
         {
-            configuration.AssertConfigurationIsValid();
+            _configuration.AssertConfigurationIsValid();
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
         {
             var reservationRequest = new CreateReservationRequestBuilder().Build();
 
-            var result = mapper.Map<Reservation>(reservationRequest);
+            var result = _mapper.Map<Reservation>(reservationRequest);
 
             result.Id.Should().BeEmpty();
             result.CarId.Should().BeEmpty();
@@ -51,7 +51,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
                 .WithDurationInMinutes(expectedDuration)
                 .Build();
 
-            var result = mapper.Map<Reservation>(reservationRequest);
+            var result = _mapper.Map<Reservation>(reservationRequest);
 
             result.InitialDate.Should().Be(initialDate);
             result.DurationInMinutes.Should().Be(TimeSpan.FromMinutes(expectedDuration));
@@ -68,7 +68,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
                 .WithDurationInMinutes(expectedDuration)
                 .Build();
 
-            var result = mapper.Map<Reservation>(reservationRequest);
+            var result = _mapper.Map<Reservation>(reservationRequest);
 
             result.EndDate.Should().Be(expectedEndingDate);
         }
@@ -92,7 +92,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
                 .WithInitialDate(initialDate)
                 .Build();
 
-            var result = mapper.Map<ReservationResponse>(reservation);
+            var result = _mapper.Map<ReservationResponse>(reservation);
 
             result.Id.Should().Be(reservation.Id);
             result.CarId.Should().Be(reservation.CarId);

@@ -12,24 +12,24 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
 {
     public class CarProfileTests
     {
-        private readonly MapperConfiguration configuration;
-        private readonly IMapper mapper;
+        private readonly MapperConfiguration _configuration;
+        private readonly IMapper _mapper;
 
         public CarProfileTests()
         {
-            configuration = new MapperConfiguration(cfg =>
+            _configuration = new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile<CarProfile>();
                 cfg.AddProfile<ReservationProfile>();
             });
 
-            mapper = configuration.CreateMapper();
+            _mapper = _configuration.CreateMapper();
         }
 
         [Test]
         public void Profile_ShouldBeCorrectlyConfigured() 
         {
-            configuration.AssertConfigurationIsValid();
+            _configuration.AssertConfigurationIsValid();
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
         {
             var carRequest = new CreateCarRequestBuilder().Build();
 
-            var result = mapper.Map<Car>(carRequest);
+            var result = _mapper.Map<Car>(carRequest);
 
             result.Id.Should().BeEmpty();
             result.Make.Should().Be(carRequest.Make);
@@ -51,7 +51,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
         {
             var carRequest = new CreateCarRequest() { Make = make, Model = model };
 
-            var result = mapper.Map<Car>(carRequest);
+            var result = _mapper.Map<Car>(carRequest);
 
             result.Id.Should().BeEmpty();
             result.Make.Should().BeEmpty();
@@ -67,7 +67,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Mapper
                 .WithModel("Some model")
                 .Build();
 
-            var result = mapper.Map<CarResponse>(car);
+            var result = _mapper.Map<CarResponse>(car);
 
             result.Id.Should().Be(car.Id);
             result.Make.Should().Be(car.Make);

@@ -1,11 +1,12 @@
-﻿using CarReservation.Api.Models.Domain;
+﻿using CarReservation.Api.Interfaces;
+using CarReservation.Api.Models.Domain;
 using FluentValidation;
 
 namespace CarReservation.Api.Models.Validations
 {
     public class ReservationValidator : AbstractValidator<Reservation>
     {
-        public ReservationValidator()
+        public ReservationValidator(ICurrentDate currentDate)
         {
             RuleFor(x => x.InitialDate)
                 .Must(date => date != default)
@@ -18,7 +19,7 @@ namespace CarReservation.Api.Models.Validations
                 .Equal(true)
                 .WithMessage("The reservation should have a maximum duration of two hours.");
 
-            RuleFor(x => x.StartsInTwentyFourHoursOrLess())
+            RuleFor(x => x.StartsInTwentyFourHoursOrLess(currentDate))
                 .Equal(true)
                 .WithMessage("The reservation can be taken up to 24 hours ahead.");
         }

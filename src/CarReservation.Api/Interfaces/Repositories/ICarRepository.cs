@@ -1,6 +1,6 @@
 ﻿using CarReservation.Api.Models.Domain;
 
-namespace CarReservation.Api.Interfaces
+namespace CarReservation.Api.Interfaces.Repositories
 {
     public interface ICarRepository
     {

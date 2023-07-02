@@ -81,14 +81,14 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
 
         internal class FindCarsReservedDuringDate : ReservationRepositoryTests 
         {
-            private readonly DateTime currentDateToUse = DateTime.UtcNow;
+            private readonly DateTime _currentDateToUse = DateTime.UtcNow;
 
             [Test]
             public void WhenDatabaseIsEmpty_ReturnsEmptyList()
             {
                 var repository = new ReservationRepository();
 
-                var carIds = repository.FindCarsReservedDuringDate(currentDateToUse);
+                var carIds = repository.FindCarsReservedDuringDate(_currentDateToUse);
 
                 carIds.Should().BeEmpty();
             }
@@ -97,7 +97,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             public void WhenReservationStartsPriorAndEndsBeforeInformedDate_ReturnsEmptyList()
             {
                 // Arrange
-                var reservationDate = currentDateToUse.AddMinutes(5);
+                var reservationDate = _currentDateToUse.AddMinutes(5);
                 var reservationDurationInMinutes = 30;
                 var dateToSearchFor = reservationDate.AddMinutes(reservationDurationInMinutes + 1);
 
@@ -121,12 +121,12 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 // Arrange
                 var durationInMinutes = 80;
-                var dateToSearch = currentDateToUse.AddMinutes(durationInMinutes - 5);
+                var dateToSearch = _currentDateToUse.AddMinutes(durationInMinutes - 5);
                 var repository = new ReservationRepository();
 
                 var reservation1 = new ReservationBuilder()
                     .WithCarId("C1")
-                    .WithInitialDate(currentDateToUse)
+                    .WithInitialDate(_currentDateToUse)
                     .WithDurationInMinutes(durationInMinutes)
                     .Build();
 
@@ -144,12 +144,12 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 // Arrange
                 var durationInMinutes = 80;
-                var dateToSearch = currentDateToUse.AddMinutes(durationInMinutes);
+                var dateToSearch = _currentDateToUse.AddMinutes(durationInMinutes);
                 var repository = new ReservationRepository();
 
                 var reservation1 = new ReservationBuilder()
                     .WithCarId("C1")
-                    .WithInitialDate(currentDateToUse)
+                    .WithInitialDate(_currentDateToUse)
                     .WithDurationInMinutes(durationInMinutes)
                     .Build();
 
@@ -167,25 +167,25 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 // Arrange
                 var repository = new ReservationRepository();
-                var dateToSearch = currentDateToUse.AddMinutes(40);
+                var dateToSearch = _currentDateToUse.AddMinutes(40);
 
                 var reservationEndsBeforeDate = new ReservationBuilder()
-                    .WithInitialDate(currentDateToUse.AddMinutes(1))
+                    .WithInitialDate(_currentDateToUse.AddMinutes(1))
                     .WithDurationInMinutes(30)
                     .Build();
 
                 var reservationEndsAfterDate1 = new ReservationBuilder()
-                    .WithInitialDate(currentDateToUse.AddMinutes(5))
+                    .WithInitialDate(_currentDateToUse.AddMinutes(5))
                     .WithDurationInMinutes(40)
                     .Build();
 
                 var reservationEndsAfterDate2 = new ReservationBuilder()
-                    .WithInitialDate(currentDateToUse.AddMinutes(1))
+                    .WithInitialDate(_currentDateToUse.AddMinutes(1))
                     .WithDurationInMinutes(55)
                     .Build();
 
                 var reservationEndsAfterDate3 = new ReservationBuilder()
-                    .WithInitialDate(currentDateToUse.AddMinutes(5))
+                    .WithInitialDate(_currentDateToUse.AddMinutes(5))
                     .WithDurationInMinutes(60)
                     .Build();
 
@@ -213,11 +213,11 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 // Arrange
                 var repository = new ReservationRepository();
-                var dateToSearch = currentDateToUse;
+                var dateToSearch = _currentDateToUse;
 
                 var reservation1 = new ReservationBuilder()
                     .WithCarId("C1")
-                    .WithInitialDate(currentDateToUse.AddMinutes(5))
+                    .WithInitialDate(_currentDateToUse.AddMinutes(5))
                     .WithDurationInMinutes(80)
                     .Build();
 
@@ -235,10 +235,10 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 // Arrange
                 var repository = new ReservationRepository();
-                var dateToSearch = currentDateToUse.AddMinutes(30);
+                var dateToSearch = _currentDateToUse.AddMinutes(30);
 
                 var reservationStartsPriorAndEndBefore1 = new ReservationBuilder()
-                    .WithInitialDate(currentDateToUse)
+                    .WithInitialDate(_currentDateToUse)
                     .WithDurationInMinutes(20)
                     .Build();
 
@@ -275,7 +275,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             {
                 // Arrange
                 var repository = new ReservationRepository();
-                var dateToSearch = currentDateToUse;
+                var dateToSearch = _currentDateToUse;
 
                 var reservationStartsPriorEndsAfter1 = new ReservationBuilder()
                     .WithInitialDate(dateToSearch.AddMinutes(-10))

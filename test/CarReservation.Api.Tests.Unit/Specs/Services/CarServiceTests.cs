@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CarReservation.Api.Interfaces;
+using CarReservation.Api.Interfaces.Repositories;
 using CarReservation.Api.Models.Domain;
 using CarReservation.Api.Models.DTO.Response;
 using CarReservation.Api.Models.Mapper;
@@ -16,27 +16,27 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
 {
     public class CarServiceTests
     {
-        private readonly Mock<IReservationRepository> reservationRepositoryMock;
-        private readonly Mock<ICarRepository> carRepositoryMock;
-        private readonly Mock<IMapper> mapperMock;
-        private readonly Mock<IValidator<Reservation>> reservationValidatorMock;
+        private readonly Mock<IReservationRepository> _reservationRepositoryMock;
+        private readonly Mock<ICarRepository> _carRepositoryMock;
+        private readonly Mock<IMapper> _mapperMock;
+        private readonly Mock<IValidator<Reservation>> _reservationValidatorMock;
 
         public CarServiceTests()
         {
-            mapperMock = new Mock<IMapper>();
-            carRepositoryMock = new Mock<ICarRepository>();
-            reservationValidatorMock = new Mock<IValidator<Reservation>>();
-            reservationRepositoryMock = new Mock<IReservationRepository>();
+            _mapperMock = new Mock<IMapper>();
+            _carRepositoryMock = new Mock<ICarRepository>();
+            _reservationValidatorMock = new Mock<IValidator<Reservation>>();
+            _reservationRepositoryMock = new Mock<IReservationRepository>();
         }
 
         internal class UpdateCar : CarServiceTests 
         {
-            private CarService service;
+            private CarService _service;
 
             [SetUp]
             public void SetUp()
             {
-                service = new CarService(carRepositoryMock.Object, mapperMock.Object, reservationRepositoryMock.Object, reservationValidatorMock.Object);
+                _service = new CarService(_carRepositoryMock.Object, _mapperMock.Object, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
             }
 
             [Test]
@@ -44,14 +44,14 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             [TestCase(null)]
             public void WhenCardIdParameterIsNullOrEmpty_ThrowsArgumentNullError(string carId) 
             {
-                Func<CarResponse> func = () => service.UpdateCar(carId, new CreateCarRequestBuilder().Build());
+                Func<CarResponse> func = () => _service.UpdateCar(carId, new CreateCarRequestBuilder().Build());
                 func.Should().Throw<ArgumentNullException>().WithParameterName("carId");
             }
 
             [Test]
             public void WhenCarRequestParameterIsNullOrEmpty_ThrowsArgumentNullError()
             {
-                Func<CarResponse> func = () => service.UpdateCar("C1", null!);
+                Func<CarResponse> func = () => _service.UpdateCar("C1", null!);
                 func.Should().Throw<ArgumentNullException>().WithParameterName("updatedCarRequest");
             }
 
@@ -64,7 +64,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var expectedMessage = $"Operation cannot be completed. There's no car with ID '{carId}'.";
 
                 // Act
-                Func<CarResponse> func = () => service.UpdateCar(carId, createCarRequest);
+                Func<CarResponse> func = () => _service.UpdateCar(carId, createCarRequest);
 
                 // Assert
                 func.Should().Throw<KeyNotFoundException>().WithMessage(expectedMessage);
@@ -87,17 +87,17 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                     .WithModel(createCarRequest.Model!)
                     .Build();
 
-                carRepositoryMock.Setup(x => x.GetById(carId))
+                _carRepositoryMock.Setup(x => x.GetById(carId))
                     .Returns(existingCar);
 
-                mapperMock.Setup(x => x.Map<Car>(createCarRequest))
+                _mapperMock.Setup(x => x.Map<Car>(createCarRequest))
                     .Returns(carMapped);
 
                 // Act
-                service.UpdateCar(carId, createCarRequest);
+                _service.UpdateCar(carId, createCarRequest);
 
                 // Assert
-                carRepositoryMock.Verify(x => 
+                _carRepositoryMock.Verify(x => 
                     x.Update(It.Is<Car>(car => car.Id == carId && car.Make == carMapped.Make && car.Model == carMapped.Model)), Times.Once());
             }
 
@@ -120,31 +120,31 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
 
                 var carMappedWithId = carMapped with { Id = carId };
 
-                carRepositoryMock.Setup(x => x.GetById(carId))
+                _carRepositoryMock.Setup(x => x.GetById(carId))
                     .Returns(existingCar);
 
-                mapperMock.Setup(x => x.Map<Car>(createCarRequest))
+                _mapperMock.Setup(x => x.Map<Car>(createCarRequest))
                     .Returns(carMapped);
 
-                carRepositoryMock.Setup(x => x.Update(It.IsAny<Car>()))
+                _carRepositoryMock.Setup(x => x.Update(It.IsAny<Car>()))
                     .Returns(carMappedWithId);
 
                 // Act
-                service.UpdateCar(carId, createCarRequest);
+                _service.UpdateCar(carId, createCarRequest);
 
                 // Assert
-                mapperMock.Verify(x => x.Map<CarResponse>(carMappedWithId), Times.Once());
+                _mapperMock.Verify(x => x.Map<CarResponse>(carMappedWithId), Times.Once());
             }
         }
 
         internal class ReserveCarAsync : CarServiceTests
         {
-            private CarService service;
+            private CarService _service;
 
             [SetUp]
             public void SetUp()
             {                
-                service = new CarService(carRepositoryMock.Object, mapperMock.Object, reservationRepositoryMock.Object, reservationValidatorMock.Object);
+                _service = new CarService(_carRepositoryMock.Object, _mapperMock.Object, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
             }
 
             [Test]
@@ -165,14 +165,14 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 };
                 var validationResultWithErrors = new ValidationResult(validationFailures);
 
-                mapperMock.Setup(x => x.Map<Reservation>(fakeReservationRequest))
+                _mapperMock.Setup(x => x.Map<Reservation>(fakeReservationRequest))
                     .Returns(fakeInvalidReservation);
 
-                reservationValidatorMock.Setup(x => x.ValidateAsync(fakeInvalidReservation, It.IsAny<CancellationToken>()))
+                _reservationValidatorMock.Setup(x => x.ValidateAsync(fakeInvalidReservation, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(validationResultWithErrors);
 
                 // Act
-                var result = await service.ReserveCarAsync(fakeReservationRequest);
+                var result = await _service.ReserveCarAsync(fakeReservationRequest);
 
                 // Assert
                 result.ReservationId.Should().BeNull();
@@ -191,20 +191,20 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var reservationRequestValidationResult = new ValidationResult();
                 var existingCarFromDatabase = new CarBuilder().WithId(carId).Build();
 
-                mapperMock.Setup(x => x.Map<Reservation>(fakeReservationRequest))
+                _mapperMock.Setup(x => x.Map<Reservation>(fakeReservationRequest))
                     .Returns(fakeInvalidReservation);
 
-                reservationValidatorMock.Setup(x => x.ValidateAsync(fakeInvalidReservation, It.IsAny<CancellationToken>()))
+                _reservationValidatorMock.Setup(x => x.ValidateAsync(fakeInvalidReservation, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(reservationRequestValidationResult);
 
-                reservationRepositoryMock.Setup(x => x.FindCarsReservedDuringDate(It.IsAny<DateTime>()))
+                _reservationRepositoryMock.Setup(x => x.FindCarsReservedDuringDate(It.IsAny<DateTime>()))
                     .Returns(new List<string>() { carId });
 
-                carRepositoryMock.Setup(x => x.GetAll())
+                _carRepositoryMock.Setup(x => x.GetAll())
                     .Returns(new List<Car>() { existingCarFromDatabase });
 
                 // Act
-                var result = await service.ReserveCarAsync(fakeReservationRequest);
+                var result = await _service.ReserveCarAsync(fakeReservationRequest);
 
                 // Assert
                 result.ReservationId.Should().BeNull();
@@ -229,23 +229,23 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var unavailableCarFromDatabase = new CarBuilder().WithId(UnavailableCarId).Build();
                 var availableCarFromDatabase = new CarBuilder().WithId(AvailableCarId).Build();
 
-                mapperMock.Setup(x => x.Map<Reservation>(fakeReservationRequest))
+                _mapperMock.Setup(x => x.Map<Reservation>(fakeReservationRequest))
                     .Returns(fakeReservation);
 
-                reservationValidatorMock.Setup(x => x.ValidateAsync(fakeReservation, It.IsAny<CancellationToken>()))
+                _reservationValidatorMock.Setup(x => x.ValidateAsync(fakeReservation, It.IsAny<CancellationToken>()))
                     .ReturnsAsync(reservationRequestValidationResult);
 
-                reservationRepositoryMock.Setup(x => x.FindCarsReservedDuringDate(It.IsAny<DateTime>()))
+                _reservationRepositoryMock.Setup(x => x.FindCarsReservedDuringDate(It.IsAny<DateTime>()))
                     .Returns(new List<string>() { UnavailableCarId });
 
-                carRepositoryMock.Setup(x => x.GetAll())
+                _carRepositoryMock.Setup(x => x.GetAll())
                     .Returns(new List<Car>() { unavailableCarFromDatabase, availableCarFromDatabase });
 
-                reservationRepositoryMock.Setup(x => x.Add(It.Is<Reservation>(reservation => reservation.CarId == AvailableCarId)))
+                _reservationRepositoryMock.Setup(x => x.Add(It.Is<Reservation>(reservation => reservation.CarId == AvailableCarId)))
                     .Returns(reservationId);
 
                 // Act
-                var result = await service.ReserveCarAsync(fakeReservationRequest);
+                var result = await _service.ReserveCarAsync(fakeReservationRequest);
 
                 // Assert
                 result.ReservationId.Should().Be(reservationId);
@@ -255,14 +255,14 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
 
         internal class AllCarReservationsUntil : CarServiceTests 
         {
-            private CarService service;
-            private IMapper realMapper;
-            private IEnumerable<Reservation> reservationsInDatabase;
+            private CarService _service;
+            private IMapper _realMapper;
+            private IEnumerable<Reservation> _reservationsInDatabase;
 
             [SetUp]
             public void SetUp()
             {
-                reservationsInDatabase = new List<Reservation>()
+                _reservationsInDatabase = new List<Reservation>()
                 {
                     new ReservationBuilder().WithCarId("C1").WithInitialDate(DateTime.UtcNow.AddHours(1)).Build(),
                     new ReservationBuilder().WithCarId("C2").WithInitialDate(DateTime.UtcNow.AddHours(2)).Build(),
@@ -271,10 +271,10 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                     new ReservationBuilder().WithCarId("C5").WithInitialDate(DateTime.UtcNow.AddHours(10)).Build(),
                     new ReservationBuilder().WithCarId("C6").WithInitialDate(DateTime.UtcNow.AddHours(15)).Build(),
                 };
-                reservationRepositoryMock.Setup(x => x.GetAll()).Returns(reservationsInDatabase);
+                _reservationRepositoryMock.Setup(x => x.GetAll()).Returns(_reservationsInDatabase);
 
-                realMapper = new MapperConfiguration(cfg => cfg.AddProfile<ReservationProfile>()).CreateMapper();
-                service = new CarService(carRepositoryMock.Object, realMapper, reservationRepositoryMock.Object, reservationValidatorMock.Object);
+                _realMapper = new MapperConfiguration(cfg => cfg.AddProfile<ReservationProfile>()).CreateMapper();
+                _service = new CarService(_carRepositoryMock.Object, _realMapper, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
             }
 
             [Test]
@@ -282,11 +282,11 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             {
                 var limitDate = (DateTime?)null;
 
-                var result = service.AllCarReservationsUntil(limitDate);
+                var result = _service.AllCarReservationsUntil(limitDate);
 
-                result.Should().HaveCount(reservationsInDatabase.Count())
+                result.Should().HaveCount(_reservationsInDatabase.Count())
                     .And
-                    .Contain(x => reservationsInDatabase.Any(
+                    .Contain(x => _reservationsInDatabase.Any(
                         reservation => reservation.Id == x.Id &&
                         reservation.CarId == x.CarId &&
                         reservation.InitialDate == x.InitialDate &&
@@ -298,9 +298,9 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             public void WhenLimitDateHasValue_ReturnsAllRegistersWhoseInitialDateAreLessOrEqualToLimitDate()
             {
                 var limitDate = DateTime.UtcNow.AddHours(9);
-                var expectedResult = reservationsInDatabase.Where(x => x.CarId != "C5" && x.CarId != "C6");
+                var expectedResult = _reservationsInDatabase.Where(x => x.CarId != "C5" && x.CarId != "C6");
 
-                var result = service.AllCarReservationsUntil(limitDate);
+                var result = _service.AllCarReservationsUntil(limitDate);
 
                 result.Should().HaveCount(4)
                     .And

@@ -16,4 +16,8 @@
 	<InternalsVisibleTo Include="CarReservation.Api.Tests.Api" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Interfaces\Services\" />
+  </ItemGroup>
+
 </Project>

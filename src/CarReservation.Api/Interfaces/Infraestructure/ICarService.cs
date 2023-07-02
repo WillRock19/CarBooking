@@ -1,7 +1,7 @@
 ﻿using CarReservation.Api.Models.DTO.Request;
 using CarReservation.Api.Models.DTO.Response;
 
-namespace CarReservation.Api.Interfaces
+namespace CarReservation.Api.Interfaces.Infraestructure
 {
     public interface ICarService
     {

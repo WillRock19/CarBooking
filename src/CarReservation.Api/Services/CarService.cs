@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using CarReservation.Api.Interfaces;
+using CarReservation.Api.Interfaces.Infraestructure;
+using CarReservation.Api.Interfaces.Repositories;
 using CarReservation.Api.Models.Domain;
 using CarReservation.Api.Models.DTO.Request;
 using CarReservation.Api.Models.DTO.Response;

@@ -27,6 +27,8 @@ The reservation is represented by an **Id**, which is a Guid, a **CarId**, an **
 
 The reservation can be taken up to 24 hours ahead and have a duration up to 2 hours (e.g. if now you are at 10 AM of a Saturday, your reservation can be made at most for 10 AM of Sunday and have the maximum duration of 2 hours).
 
+> **IMPORTANT**: All reservation's dates are [UTC dates](https://stackoverflow.com/questions/16307563/utc-time-explanation), so every request for a reservation should take this in consideration.
+
 # How to run
 
 <Explain how to run this project>

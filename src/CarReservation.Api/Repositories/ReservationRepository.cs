@@ -1,4 +1,4 @@
-﻿using CarReservation.Api.Interfaces;
+﻿using CarReservation.Api.Interfaces.Repositories;
 using CarReservation.Api.Models.Domain;
 
 namespace CarReservation.Api.Repositories

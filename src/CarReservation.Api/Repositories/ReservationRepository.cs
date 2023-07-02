@@ -29,9 +29,7 @@ namespace CarReservation.Api.Repositories
             return entity;
         }
 
-        public IEnumerable<Reservation> GetAll() => Database.Values;
-
-        public IEnumerable<Reservation> GetUpcomingReservations(ICurrentDate currentDate) =>
+        public IEnumerable<Reservation> GetAllUpcomingReservations(ICurrentDate currentDate) =>
             Database.Values
                 .Where(x => x.InitialDate > currentDate.DateUtcNow());
 

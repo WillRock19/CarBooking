@@ -169,7 +169,7 @@ namespace CarReservation.Api.Controllers
         {
             try
             {
-                var allReservationsResponse = carService.AllUpcomingReservationsUntil(limitDate);
+                var allReservationsResponse = carService.GetAllUpcomingReservationsUntil(limitDate);
                 return Ok(allReservationsResponse);
             }
             catch (Exception e)

@@ -48,39 +48,6 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
             }
         }
 
-        internal class GetAll : ReservationRepositoryTests 
-        {
-            [Test]
-            public void WhenDatabaseIsEmpty_ReturnsEmptyList()
-            {
-                var repository = new ReservationRepository();
-
-                repository.GetAll().Should().BeEmpty();
-            }
-
-            [Test]
-            public void WhenDatabaseHasReservations_ReturnsAllReservations()
-            {
-                var repository = new ReservationRepository();
-
-                var firstReservation = new ReservationBuilder().Build();
-                var firstReservationId = repository.Add(firstReservation);
-
-                var secondReservation = new ReservationBuilder().Build();
-                var secondReservationId = repository.Add(secondReservation);
-
-                var thirdReservation = new ReservationBuilder().Build();
-                var thirdReservationId = repository.Add(thirdReservation);
-
-                repository.GetAll().Should().BeEquivalentTo(new List<Reservation>
-                {
-                    firstReservation with { Id = firstReservationId },
-                    secondReservation with { Id = secondReservationId },
-                    thirdReservation with { Id = thirdReservationId },
-                });
-            }
-        }
-
         internal class FindCarsReservedDuringDate : ReservationRepositoryTests 
         {
             private readonly DateTime _currentDateToUse = DateTime.UtcNow;
@@ -348,7 +315,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
                 _repository.Add(reservation3);
                 _repository.Add(reservation4);
 
-                _repository.GetUpcomingReservations(_currentDateMock.Object).Should().BeEmpty();
+                _repository.GetAllUpcomingReservations(_currentDateMock.Object).Should().BeEmpty();
             }
 
             [Test]
@@ -372,7 +339,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
                     reservation4 with { Id = idReservation4 }
                 };
 
-                _repository.GetUpcomingReservations(_currentDateMock.Object).Should().BeEquivalentTo(expectedResult);
+                _repository.GetAllUpcomingReservations(_currentDateMock.Object).Should().BeEquivalentTo(expectedResult);
             }
 
             [Test]
@@ -408,7 +375,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Repositories
                     reservation4 with { Id = idReservation4 }
                 };
 
-                _repository.GetUpcomingReservations(_currentDateMock.Object).Should().BeEquivalentTo(expectedResult);
+                _repository.GetAllUpcomingReservations(_currentDateMock.Object).Should().BeEquivalentTo(expectedResult);
             }
         }
     }

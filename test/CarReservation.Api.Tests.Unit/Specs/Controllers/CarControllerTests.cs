@@ -150,7 +150,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Controllers
                 const string exceptionMessage = "Some exception message";
                 var dateLimit = DateTime.UtcNow.AddHours(5);
 
-                _carServiceMock.Setup(x => x.AllUpcomingReservationsUntil(dateLimit))
+                _carServiceMock.Setup(x => x.GetAllUpcomingReservationsUntil(dateLimit))
                     .Throws(new Exception(exceptionMessage));
 
                 var resultAsBadRequest = _carController

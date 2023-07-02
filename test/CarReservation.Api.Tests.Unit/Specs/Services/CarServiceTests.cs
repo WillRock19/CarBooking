@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CarReservation.Api.Interfaces;
 using CarReservation.Api.Interfaces.Repositories;
 using CarReservation.Api.Models.Domain;
 using CarReservation.Api.Models.DTO.Response;
@@ -18,6 +19,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
     {
         private readonly Mock<IReservationRepository> _reservationRepositoryMock;
         private readonly Mock<ICarRepository> _carRepositoryMock;
+        private readonly Mock<ICurrentDate> _currentDateMock;
         private readonly Mock<IMapper> _mapperMock;
         private readonly Mock<IValidator<Reservation>> _reservationValidatorMock;
 
@@ -25,6 +27,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
         {
             _mapperMock = new Mock<IMapper>();
             _carRepositoryMock = new Mock<ICarRepository>();
+            _currentDateMock = new Mock<ICurrentDate>();
             _reservationValidatorMock = new Mock<IValidator<Reservation>>();
             _reservationRepositoryMock = new Mock<IReservationRepository>();
         }
@@ -36,7 +39,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             [SetUp]
             public void SetUp()
             {
-                _service = new CarService(_carRepositoryMock.Object, _mapperMock.Object, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
+                _service = new CarService(_carRepositoryMock.Object, _currentDateMock.Object, _mapperMock.Object, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
             }
 
             [Test]
@@ -129,7 +132,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             [SetUp]
             public void SetUp()
             {                
-                _service = new CarService(_carRepositoryMock.Object, _mapperMock.Object, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
+                _service = new CarService(_carRepositoryMock.Object, _currentDateMock.Object, _mapperMock.Object, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
             }
 
             [Test]
@@ -238,7 +241,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             }
         }
 
-        internal class AllUpcomingReservationsUntil : CarServiceTests 
+        internal class GetAllUpcomingReservationsUntil : CarServiceTests 
         {
             private CarService _service;
             private IMapper _realMapper;
@@ -256,10 +259,11 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                     new ReservationBuilder().WithCarId("C5").WithInitialDate(DateTime.UtcNow.AddHours(10)).Build(),
                     new ReservationBuilder().WithCarId("C6").WithInitialDate(DateTime.UtcNow.AddHours(15)).Build(),
                 };
-                _reservationRepositoryMock.Setup(x => x.GetAll()).Returns(_reservationsInDatabase);
+                _reservationRepositoryMock.Setup(x => x.GetAllUpcomingReservations(It.IsAny<ICurrentDate>()))
+                    .Returns(_reservationsInDatabase);
 
                 _realMapper = new MapperConfiguration(cfg => cfg.AddProfile<ReservationProfile>()).CreateMapper();
-                _service = new CarService(_carRepositoryMock.Object, _realMapper, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
+                _service = new CarService(_carRepositoryMock.Object, _currentDateMock.Object, _realMapper, _reservationRepositoryMock.Object, _reservationValidatorMock.Object);
             }
 
             [Test]
@@ -267,7 +271,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             {
                 var limitDate = (DateTime?)null;
 
-                var result = _service.AllUpcomingReservationsUntil(limitDate);
+                var result = _service.GetAllUpcomingReservationsUntil(limitDate);
 
                 result.Should().HaveCount(_reservationsInDatabase.Count())
                     .And
@@ -285,7 +289,7 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
                 var limitDate = DateTime.UtcNow.AddHours(9);
                 var expectedResult = _reservationsInDatabase.Where(x => x.CarId != "C5" && x.CarId != "C6");
 
-                var result = _service.AllUpcomingReservationsUntil(limitDate);
+                var result = _service.GetAllUpcomingReservationsUntil(limitDate);
 
                 result.Should().HaveCount(4)
                     .And

@@ -37,21 +37,22 @@ The reservation can be taken up to 24 hours ahead and have a duration up to 2 ho
 
 The API is written in .NET Core 7, and uses the following libraries:
 
-* AutoMapper;
-* FluentValidation;
-* Swagger;
+* [AutoMapper](https://automapper.org/);
+* [FluentValidation](https://docs.fluentvalidation.net/en/latest/);
+* [Swagger](https://swagger.io/);
 
 The unit tests are made with the following technologies:
 
-* NUnit;
-* FluentAssertions;
+* [NUnit](https://nunit.org/);
+* [FluentAssertions](https://fluentassertions.com/);
+* [Moq](https://github.com/moq/moq);
 
 The api tests are made with the following technologies:
 
-* NUnit;
-* FluentAssertions;
-* Microsoft.AspNetCore.Mvc.Testing;
-* Microsoft.AspNetCore.TestHost;
+* [NUnit](https://nunit.org/);
+* [FluentAssertions](https://fluentassertions.com/);
+* [Microsoft.AspNetCore.Mvc.Testing](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.mvc.testing?view=aspnetcore-7.0);
+* [Microsoft.AspNetCore.TestHost](https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.testhost?view=aspnetcore-7.0);
 
 # Architectural Decisions
 

@@ -56,21 +56,6 @@ namespace CarReservation.Api.Tests.Unit.Specs.Services
             }
 
             [Test]
-            public void WhenCarDoesNotExistInDatabase_ThrowsKeyNotFoundError()
-            {
-                // Arrange
-                var carId = "C1";
-                var createCarRequest = new CreateCarRequestBuilder().Build();
-                var expectedMessage = $"Operation cannot be completed. There's no car with ID '{carId}'.";
-
-                // Act
-                Func<CarResponse> func = () => _service.UpdateCar(carId, createCarRequest);
-
-                // Assert
-                func.Should().Throw<KeyNotFoundException>().WithMessage(expectedMessage);
-            }
-
-            [Test]
             public void WhenCarExistsInDatabase_ShouldCallUpdateWithMappedCarRequestContainingOriginalCarId()
             {
                 // Arrange

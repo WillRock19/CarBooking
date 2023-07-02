@@ -54,7 +54,6 @@ namespace CarReservation.Api.Services
             if (updatedCarRequest == null)
                 throw new ArgumentNullException(nameof(updatedCarRequest));
 
-            var _ = carRepository.GetById(carId) ?? throw new KeyNotFoundException($"Operation cannot be completed. There's no car with ID '{carId}'.");
             var carUpdated = carRepository.Update(mapper.Map<Car>(updatedCarRequest) with 
             { 
                 Id = carId 

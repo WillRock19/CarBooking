@@ -5,7 +5,7 @@ namespace CarReservation.Api.Repositories
 {
     public class CarRepository : ICarRepository
     {
-        private int LatestRegisterCount;
+        private long LatestRegisterCount;
         private readonly Dictionary<string, Car> Database;
 
         public CarRepository()

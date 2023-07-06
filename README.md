@@ -31,11 +31,9 @@ The reservation can be taken up to 24 hours ahead and have a duration up to 2 ho
 
 # How to run
 
-To run this project, you'll need .NET Core 7 and/or docker in your machine. In this section, we'll explain how to do it.
-
 ## Running with docker
 
-> **IMPORTANT**: For this tutorial to work, you should have docker already installed.
+> **IMPORTANT**: You should already have [docker](https://docs.docker.com/engine/install/) installed.
 
 There's a Dockerfile in the root directory that will build and run the project inside a container. 
 
@@ -64,8 +62,9 @@ To execute it, you can run the **build.ps1** (for Windows) or **build.sh** (for 
 * Type **http://localhost:5000/index/html**
 * Enjoy the application :)
 
-
 ## Running with .NET Core 7.0
+
+> **IMPORTANT**: You should already have [.NET Core 7](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) installed. 
 
 * Clonet the project;
 * Navigate to the project root;
@@ -73,7 +72,6 @@ To execute it, you can run the **build.ps1** (for Windows) or **build.sh** (for 
 * Run **dotnet run**;
 * Go to your favorite browser;
 * Type: **http://localhost:5225/index.html**;
-
 
 # Technologies
 

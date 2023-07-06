@@ -31,7 +31,47 @@ The reservation can be taken up to 24 hours ahead and have a duration up to 2 ho
 
 # How to run
 
-<Explain how to run this project>
+## Running with docker
+
+> **IMPORTANT**: You should already have [docker](https://docs.docker.com/engine/install/) installed.
+
+There's a Dockerfile in the root directory that will build and run the project inside a container. 
+
+To execute it, you can run the **build.ps1** (for Windows) or **build.sh** (for UNIX base OS) scripts. Both scripts are going to create an image called **carbooking-image** and then run the containner mapping it to localhost port 5000. 
+
+### Running inside a Windows
+
+* Clone the project;
+* Open a Powershell terminal;
+* Navigate to the project root;
+* Run **./build.ps1**
+* Wait for the console to print the container ID (e.g. 1720dbf178abbfd5f817e79748da1e86368c954bdf19a10993e4b17e7aee491b)
+* Go to your favorite browser;
+* Type **http://localhost:5000/index/html**
+* Enjoy the application :)
+
+### Running inside a Linux base OD
+
+* Clone the project;
+* Open your terminal;
+* Navigate to the project root;
+* Make the script file executable with **chmod +x run-container.sh**;
+* Run **./build.sh**
+* Wait for the console to print the container ID (e.g. 1720dbf178abbfd5f817e79748da1e86368c954bdf19a10993e4b17e7aee491b)
+* Go to your favorite browser;
+* Type **http://localhost:5000/index/html**
+* Enjoy the application :)
+
+## Running with .NET Core 7.0
+
+> **IMPORTANT**: You should already have [.NET Core 7](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) installed. 
+
+* Clonet the project;
+* Navigate to the project root;
+* Go to **src\CarReservation.Api**;
+* Run **dotnet run**;
+* Go to your favorite browser;
+* Type: **http://localhost:5225/index.html**;
 
 # Technologies
 

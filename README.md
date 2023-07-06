@@ -6,8 +6,8 @@ At this moment, this project is a basic Reservation API. The idea is to allow an
 
 This API supports basically two flows:
 
-* Car flow - basically, all CRUD operations associated with a car, like Create, Update, Remove, GetAll (without pagination) and GetById;
-* Reservation flow - basically, operations associated with the reservation of a car, like reserving for a specific moment in time and a GetAll upcoming reservations;
+* **Car flow** - basically, all CRUD operations associated with a car, like Create, Update, Remove, GetAll (without pagination) and GetById;
+* **Reservation flow** - basically, operations associated with the reservation of a car, like reserving for a specific moment in time and a GetAll upcoming reservations;
 
 All APIs communication should be made using **JSON** objects.
 
@@ -73,7 +73,7 @@ To execute it, you can run the **build.ps1** (for Windows) or **build.sh** (for 
 * Go to **src\CarReservation.Api**;
 * Run **dotnet run**;
 * Go to your favorite browser;
-* Type: **http://localhost:5225/index.html**;
+* Type: **https://localhost:7259/index.html**;
 
 ## Running the API with .NET + docker
 
@@ -162,3 +162,8 @@ There are two types of tests in this project:
 
 * 1. **Unit tests:** usually checks the methods execution by itself, mocking it's depedencies;
 * 2. **Api tests:** tests the api from a user standpoint, making requests and expecting responses in a [blackbox approach](https://en.wikipedia.org/wiki/Black-box_testing);
+
+# Future Improvements
+
+* 1. Make the controller a Minimal API;
+* 2. Remove Automapper and add [Mapperly instead](https://github.com/riok/mapperly);

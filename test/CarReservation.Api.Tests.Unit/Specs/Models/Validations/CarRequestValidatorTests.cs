@@ -27,25 +27,23 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Validations
         }
 
         [Test]
-        [TestCase(null)]
-        [TestCase("")]
-        public void Validator_WhenMakeIsNullOrEmpty_ReturnsErrorMessage(string make) 
+        public void Validator_WhenMakeIsEmpty_ReturnsErrorMessage() 
         {
             var propertyName = nameof(CreateCarRequest.Make);
-            var carRequest = new CreateCarRequest() { Make = make };
+            var carRequest = new CreateCarRequestBuilder().WithMake(string.Empty).Build();
 
             var result = _carRequestValidator.Validate(carRequest);
 
             result.Errors
                 .Should()
-                .Contain(x => x.PropertyName == propertyName && x.ErrorMessage == $"{propertyName} should not be null, empty.");
+                .Contain(x => x.PropertyName == propertyName && x.ErrorMessage == $"{propertyName} should not be empty.");
         }
 
         [Test]
         public void Validator_WhenMakeHasLessThanTwoCharacters_ReturnsErrorMessage()
         {
             var propertyName = nameof(CreateCarRequest.Make);
-            var carRequest = new CreateCarRequest() { Make = "A" };
+            var carRequest = new CreateCarRequestBuilder().WithMake("A").Build();
 
             var result = _carRequestValidator.Validate(carRequest);
 
@@ -55,25 +53,23 @@ namespace CarReservation.Api.Tests.Unit.Specs.Models.Validations
         }
 
         [Test]
-        [TestCase(null)]
-        [TestCase("")]
-        public void Validator_WhenModelIsNullOrEmpty_ReturnsErrorMessage(string model)
+        public void Validator_WhenModelIsEmpty_ReturnsErrorMessage()
         {
             var propertyName = nameof(CreateCarRequest.Model);
-            var carRequest = new CreateCarRequest() { Model = model };
+            var carRequest = new CreateCarRequestBuilder().WithModel(string.Empty).Build();
 
             var result = _carRequestValidator.Validate(carRequest);
 
             result.Errors
                 .Should()
-                .Contain(x => x.PropertyName == propertyName && x.ErrorMessage == $"{propertyName} should not be null, empty.");
+                .Contain(x => x.PropertyName == propertyName && x.ErrorMessage == $"{propertyName} should not be empty.");
         }
 
         [Test]
         public void Validator_WhenModelHasLessThanTwoCharacters_ReturnsErrorMessage()
         {
             var propertyName = nameof(CreateCarRequest.Model);
-            var carRequest = new CreateCarRequest() { Model = "A" };
+            var carRequest = new CreateCarRequestBuilder().WithModel("A").Build();
 
             var result = _carRequestValidator.Validate(carRequest);
 

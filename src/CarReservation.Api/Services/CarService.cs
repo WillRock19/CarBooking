@@ -80,7 +80,7 @@ namespace CarReservation.Api.Services
                 .ValidateAsync(reservation);
             
             if(!validationResult.IsValid)
-                return new CreateReservationResponse(BuildReservationValidErrorMessage(validationResult.Errors));
+                return new CreateReservationResponse { Message = BuildReservationValidErrorMessage(validationResult.Errors) };
 
             var carsReservedInIntervalSet = new HashSet<string>(reservationRepository
                 .FindCarsReservedDuringDate(reservation.InitialDate));
@@ -91,13 +91,18 @@ namespace CarReservation.Api.Services
                 .ToList();
 
             if (!carsAvailableForReservation.Any()) 
-                return new CreateReservationResponse("There's no car available for the desired date and time.");
+                return new CreateReservationResponse { Message = "There's no car available for the desired date and time." };
 
             var carToReserve = carsAvailableForReservation.First();
             var reservationId = reservationRepository.Add(reservation with { CarId = carToReserve.Id });
             var successMessage = $"Reservation successfully created for {reservation.InitialDate}. Your reservation ID is: {reservationId}.";
 
-            return new CreateReservationResponse(reservationId, carToReserve.Id, successMessage);
+            return new CreateReservationResponse
+            {
+                ReservationId = reservationId,
+                CarId = carToReserve.Id,
+                Message = successMessage,
+            };
         }
 
         public IEnumerable<ReservationResponse> GetAllUpcomingReservationsUntil(DateTime? limitDate) 

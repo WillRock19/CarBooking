@@ -162,3 +162,8 @@ There are two types of tests in this project:
 
 * 1. **Unit tests:** usually checks the methods execution by itself, mocking it's depedencies;
 * 2. **Api tests:** tests the api from a user standpoint, making requests and expecting responses in a [blackbox approach](https://en.wikipedia.org/wiki/Black-box_testing);
+
+# Future Improvements
+
+* 1. Make the controller a Minimal API;
+* 2. Remove Automapper and add [Mapperly instead](https://github.com/riok/mapperly);

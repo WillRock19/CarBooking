@@ -31,7 +31,7 @@ The reservation can be taken up to 24 hours ahead and have a duration up to 2 ho
 
 # How to run
 
-## Running with docker
+## Running the API with docker
 
 > **IMPORTANT**: You should already have [docker](https://docs.docker.com/engine/install/) installed.
 
@@ -62,7 +62,7 @@ To execute it, you can run the **build.ps1** (for Windows) or **build.sh** (for 
 * Type **http://localhost:5000/index/html**
 * Enjoy the application :)
 
-## Running with .NET Core 7.0
+## Running the API with .NET Core 7.0
 
 > **IMPORTANT**: You should already have [.NET Core 7](https://dotnet.microsoft.com/en-us/download/dotnet/7.0) installed. 
 
@@ -72,6 +72,26 @@ To execute it, you can run the **build.ps1** (for Windows) or **build.sh** (for 
 * Run **dotnet run**;
 * Go to your favorite browser;
 * Type: **http://localhost:5225/index.html**;
+
+## Running the API with .NET + docker
+
+You could also generate a docker image if you have the .NET Core Cmdline installed. 
+
+This is a new feature, that comes with .NET Core 7.0, which this project supports. To do this, you basically needs to:
+
+1. Run the command to generate a docker image with .NET
+
+```
+dotnet publish --os linux --arch x64 -p:PublishProfile=DefaultContainer -p:ContainerImageName=carreservation-api
+``` 
+
+2. Run docker with the generated image, **carreservation-api:<VERSION_GENERATED>**. In our example, the version is **1.0.0**.
+
+```
+docker run -p 5000:80 carreservation-api:1.0.0
+```
+
+To learn more, check this link.
 
 # Technologies
 
@@ -96,5 +116,47 @@ The api tests are made with the following technologies:
 
 # Architectural Decisions
 
-<Explain the architectural decisions.>
+## API structure
 
+The project basically uses a Controller manage the flow, a Service to apply the logic and a Repositories. Each of then could be interpreted as different layers for the API. Since this is a small project, we decided to keep all of them inside the **CarReservation.Api**. 
+
+If the project gets bigger, we could follow one of the following approachs: 
+
+* 1. Export the classes of each folder into it's own project's layer;
+* 2. Keep it as it is and treat the CarReservation.Api as a microsservice; 
+
+The decision should be made only when needed. For now, this simple structure solves the client's need. 
+
+## Validations
+
+The model validations for the user's requests are being made in two steps:
+
+* 1. Validating if the data can be used;
+* 2. Validating if the data is acceptable;
+
+The first step is beng made at controller level, where the controller checks if the parameter can be processed and then returns any possible error.
+
+The second step is being made inside a specific validation class. We are using FluentValidation to add all business validations, which should check if the received data can be processed (is valid).
+
+## Request/Response models
+
+To keep our api context separated from the outside world, we decided to create models for the request/response operations, which are in the folder DTO. 
+
+The idea here is to allow the development of the API without affecting any consumer, or even evolve the communication with the consumers without affecting the internal logic of the API. 
+
+Basically, applying some concepts of the [Hexagonal Architecture pattern](https://alistair.cockburn.us/hexagonal-architecture/), where we have the Adapters (here represented by our AutoMapper) to adapt any outside request to an internal model, and any internal model to an outside response.
+
+## Choosing an available car to create a reservation
+
+Currently, the logic of choosing an available car for a reservation might create some pitfalls. It could happen that only the same car will be chosen more times than any other. 
+
+Since the original problem statement didn't specified any rule to choose between all the available cars, we are always using the first one that's free.
+
+A possible improvement could be applying some rule like **if the car wasn't under use for the past hour**, o even **a random car from the list**, but that depends on the further specifications.
+
+## Automated tests
+
+There are two types of tests in this project:
+
+* 1. Unit tests: usually checks the methods execution by itself, mocking it's depedencies;
+* 2. Api tests: tests the api from a user standpoint, making requests and expecting responses in a [blackbox approach](https://en.wikipedia.org/wiki/Black-box_testing);

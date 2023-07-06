@@ -6,17 +6,17 @@
     public class CarResponse
     {
         /// <summary>
-        /// The Id of the car, as stored in the database.
+        /// The Id of the car, as stored in the database. It should never be null.
         /// </summary>
         public required string Id { get; init; }
 
         /// <summary>
-        /// The Make of the car, as stored in the database.
+        /// The Make of the car, as stored in the database. It should never be null.
         /// </summary>
         public required string Make { get; init; }
 
         /// <summary>
-        /// The Model of the car, as stored in the database.
+        /// The Model of the car, as stored in the database. It should never be null.
         /// </summary>
         public required string Model { get; init; }
     }

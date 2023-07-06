@@ -77,7 +77,7 @@ To execute it, you can run the **build.ps1** (for Windows) or **build.sh** (for 
 
 You could also generate a docker image if you have the .NET Core Cmdline installed. 
 
-This is a new feature, that comes with .NET Core 7.0, which this project supports. To do this, you basically needs to:
+This is a new feature, that comes with .NET Core 7.0. To do this, you basically needs to:
 
 1. Run the command to generate a docker image with .NET
 
@@ -158,5 +158,5 @@ A possible improvement could be applying some rule like **if the car wasn't unde
 
 There are two types of tests in this project:
 
-* 1. Unit tests: usually checks the methods execution by itself, mocking it's depedencies;
-* 2. Api tests: tests the api from a user standpoint, making requests and expecting responses in a [blackbox approach](https://en.wikipedia.org/wiki/Black-box_testing);
+* 1. **Unit tests:** usually checks the methods execution by itself, mocking it's depedencies;
+* 2. **Api tests:** tests the api from a user standpoint, making requests and expecting responses in a [blackbox approach](https://en.wikipedia.org/wiki/Black-box_testing);

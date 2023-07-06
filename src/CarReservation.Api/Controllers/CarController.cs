@@ -7,8 +7,12 @@ using System.Net;
 
 namespace CarReservation.Api.Controllers
 {
+    /// <summary>
+    /// Endpoint that deals with operations associated to a car (CRUD and renting)
+    /// </summary>
     [ApiController]
     [Consumes("application/json")]
+    [Produces("application/json")]
     [Route("api/v1/[controller]")]
     public class CarController : ControllerBase
     {
